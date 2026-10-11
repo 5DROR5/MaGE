@@ -15,6 +15,14 @@
   Everything is built inside the game, no Blender and no Python.
 </p>
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=mDCQ67WTRtw">
+    <img src="https://img.youtube.com/vi/mDCQ67WTRtw/maxresdefault.jpg" alt="Watch the teaser" width="640">
+  </a>
+  <br>
+  <em>Click the image to watch the teaser.</em>
+</p>
+
 ---
 
 ## What you can build
