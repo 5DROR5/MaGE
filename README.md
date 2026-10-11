@@ -23,7 +23,7 @@
 |---|---|
 | **Sidewalks and traffic islands** | Curbs, walkways and islands from DecalRoads, including joins at junctions |
 | **Walls and bridges** | From MeshRoads: textured walls, top surface, bridge railings, battlements and gates |
-| **Buildings** | A building in one click, floors that snap onto each other, the game's windows and doors |
+| **Buildings [BETA]** | A building in one click, floors that snap onto each other, the game's windows and doors |
 | **Import** | Save Road Architect roads and Building Architect buildings as permanent objects |
 
 **The same MeshRoad, two results.** On the right, the MeshRoad itself; on the left, what MaGE built from it:
