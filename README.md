@@ -70,6 +70,8 @@
 | DecalRoads under 0.5 m wide in a closed loop | A filled traffic island with a curb |
 | MeshRoad | A wall, a bridge or a building floor |
 
+> For a sidewalk to follow the ground, untick **overObjects** on the DecalRoad.
+
 ![Step 1 - what you draw](images/icon_decal_1.png)
 
 **A:** one DecalRoad whose width changes between nodes. **B:** two DecalRoads close together with a gap between them. **C:** thin DecalRoads in a closed loop. **D:** four wide DecalRoads forming a rectangle.
