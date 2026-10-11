@@ -44,7 +44,7 @@
 
 ## Installation
 
-**1.** Copy `MaGE_1.0.0.zip` as-is, without extracting it, into:
+**1.** Copy `MaGE_1.0.1.zip` as-is, without extracting it, into:
 
 ```
 %LOCALAPPDATA%\BeamNG\BeamNG.drive\current\mods\
