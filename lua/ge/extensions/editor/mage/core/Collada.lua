@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - COLLADA reader
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -314,6 +314,13 @@ local function instancesOf(scene, libNodes, root)
     return out
 end
 
+local function sameMatrix(a, b)
+    for i = 1, 16 do
+        if math.abs(a[i] - b[i]) > 1e-6 then return false end
+    end
+    return true
+end
+
 local function topDetail(list)
     local best = {}
     for _, inst in ipairs(list) do
@@ -324,9 +331,24 @@ local function topDetail(list)
         if not cur or d > cur then best[base] = d end
         inst.base, inst.detail = base, d
     end
+    local tops = {}
+    for _, inst in ipairs(list) do
+        if inst.detail == best[inst.base] then
+            local l         = tops[inst.base] or {}
+            tops[inst.base] = l
+            l[#l + 1]       = inst
+        end
+    end
     local out = {}
     for _, inst in ipairs(list) do
-        if inst.detail == best[inst.base] then out[#out + 1] = inst end
+        local keep = inst.detail == best[inst.base]
+        if not keep then
+            keep = true
+            for _, t in ipairs(tops[inst.base]) do
+                if sameMatrix(t.m, inst.m) then keep = false end
+            end
+        end
+        if keep then out[#out + 1] = inst end
     end
     return out
 end

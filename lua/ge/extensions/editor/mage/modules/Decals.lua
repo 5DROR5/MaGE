@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - decal paths, junctions and traffic islands
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -726,13 +726,16 @@ local function hairpinUnionRing(rdI, eI, rdJ, eJ, tip)
     for _, q in ipairs(arcPoints(tip.x, tip.y, aOut[#aOut], bOut[#bOut], zt,
                                  roundEnd.maxTurnDeg, tipVia)) do push(q) end
     for i = #bOut, 1, -1 do push(bOut[i]) end
-    if not (eJ and rdJ.noCapStart or rdJ.noCapEnd) then
+    local skipJ, skipI
+    if eJ then skipJ = rdJ.noCapStart else skipJ = rdJ.noCapEnd end
+    if eI then skipI = rdI.noCapStart else skipI = rdI.noCapEnd end
+    if not skipJ then
         for _, q in ipairs(freeCap(pb, wb, bOut[1], bIn[1])) do push(q) end
     end
     for i = 1, ib do push(bIn[i]) end
     push(K)
     for i = ia, 1, -1 do push(aIn[i]) end
-    if not (eI and rdI.noCapStart or rdI.noCapEnd) then
+    if not skipI then
         for _, q in ipairs(freeCap(pa, wa, aIn[1], aOut[1])) do push(q) end
     end
 

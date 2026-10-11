@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - geometry builder
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -1714,7 +1714,7 @@ function mr.prepareMeshRoad(spl)
         local nodeD = {0.0}
         for k = 2, #raw do
             local a, b = raw[k - 1], raw[k]
-            nodeD[k]   = nodeD[k - 1] + math.sqrt((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2)
+            nodeD[k]   = nodeD[k - 1] + math.sqrt((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2 + (b.z - a.z) ^ 2)
         end
         mrState.up       = function(s) return mr.upAt(ups, nodeD, s) end
         local lever, hw0 = 0.0, (rawW[1] or 2.0) / 2.0
@@ -1869,7 +1869,7 @@ local function buildRoadMesh(spl)
             local forced = nil
             if secT then
                 forced = {}
-                for i = 1, np do forced[i] = secT[i] ~= nil end
+                for i = 1, np do forced[i] = secT[i] and true or false end
             end
             local w    = (pathW and #pathW == np) and pathW or nil
             local keep = mr.simplifyIndices(path, w, nil, meshRoad.simplifyTol * mrState.turnScale, forced,

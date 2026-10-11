@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - buildings made of stacked MeshRoads
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -10,6 +10,7 @@ local Window  = require("editor/mage/core/Window")
 local Modules = require("editor/mage/core/Modules")
 local S       = require("editor/mage/config/Settings")
 local BA      = require("editor/mage/modules/BuildingArchitect")
+local C       = require("editor/mage/core/Common")
 
 -- =============================================================================
 -- CONSTANTS
@@ -45,9 +46,10 @@ local defaults = {
 -- =============================================================================
 
 local fields = {}
-local cache  = {at = -math.huge, list = {}, byId = {}, byKey = {}}
+local cache  = {at = -math.huge, gen = 0, list = {}, byId = {}, byKey = {}}
 local memory = {}
 local serial = 0
+local synced = -1
 
 -- =============================================================================
 -- DATA
@@ -130,6 +132,34 @@ end
 -- INDEX
 -- =============================================================================
 
+local function firstNode(id)
+    local obj = scenetree.findObjectById(id)
+    if not obj or obj:getNodeCount() == 0 then return nil end
+    return obj:getNodePosition(0)
+end
+
+local function remapCopies(copies)
+    local byOld = {}
+    for _, c in ipairs(copies) do
+        local l         = byOld[c.oldKey] or {}
+        byOld[c.oldKey] = l
+        l[#l + 1]       = c
+    end
+    for _, c in ipairs(copies) do
+        local cands = c.e.data.below and byOld[c.e.data.below]
+        local best  = nil
+        if cands then
+            local p, bestD = firstNode(c.e.id), math.huge
+            for _, o in ipairs(cands) do
+                local q = p and firstNode(o.e.id)
+                local d = q and ((q.x - p.x) ^ 2 + (q.y - p.y) ^ 2) or math.huge
+                if not best or d < bestD then best, bestD = o, d end
+            end
+        end
+        c.e.data.below = best and best.e.data.key or nil
+    end
+end
+
 local function index(force)
     local now = os.clock()
     if not force and now - cache.at < refresh then return cache end
@@ -140,18 +170,25 @@ local function index(force)
         if b then found[#found + 1] = {id = obj:getID(), data = b} end
     end
     table.sort(found, function(a, b) return a.id < b.id end)
-    local list, byId, byKey = {}, {}, {}
+    local list, byId, byKey, copies = {}, {}, {}, {}
     for _, e in ipairs(found) do
-        if not e.data.key or byKey[e.data.key] then
+        if not e.data.key then
             e.data.key = newKey()
             write(e.id, fields.building, encode(e.data))
+        elseif byKey[e.data.key] then
+            copies[#copies + 1] = {e = e, oldKey = e.data.key}
+            e.data.key          = newKey()
         end
-        if e.data.below == e.data.key then e.data.below = nil end
-        list[#list + 1]  = e
+        list[#list + 1]   = e
         byId[e.id]        = e
         byKey[e.data.key] = e
     end
-    cache = {at = now, list = list, byId = byId, byKey = byKey}
+    remapCopies(copies)
+    for _, c in ipairs(copies) do write(c.e.id, fields.building, encode(c.e.data)) end
+    for _, e in ipairs(list) do
+        if e.data.below == e.data.key then e.data.below = nil end
+    end
+    cache = {at = now, gen = cache.gen + 1, list = list, byId = byId, byKey = byKey}
     return cache
 end
 
@@ -279,13 +316,41 @@ local function level(e, idx)
     return n, cur ~= nil
 end
 
+local function root(e, idx)
+    local cur, seen = e, {}
+    while not seen[cur] do
+        seen[cur] = true
+        local b   = below(cur, idx)
+        if not b then return cur end
+        cur = b
+    end
+    return cur
+end
+
+local function activeRoots(idx)
+    local roots = {}
+    for _, id in ipairs(editor.selection.object or {}) do
+        local e = idx.byId[id]
+        if e then roots[root(e, idx)] = true end
+    end
+    return roots
+end
+
 local function sync()
     if not fields.building then return end
     local idx   = index()
+    local roots = nil
+    if idx.gen == synced then
+        roots = activeRoots(idx)
+        if next(roots) == nil then return end
+    end
+    synced      = idx.gen
     local order = {}
     for _, e in ipairs(idx.list) do
-        local lv, loop = level(e, idx)
-        order[#order + 1] = {e = e, lv = lv, loop = loop}
+        if not roots or roots[root(e, idx)] then
+            local lv, loop = level(e, idx)
+            order[#order + 1] = {e = e, lv = lv, loop = loop}
+        end
     end
     table.sort(order, function(a, b) return a.lv < b.lv end)
     for _, o in ipairs(order) do
@@ -390,7 +455,7 @@ local function stack(id)
 end
 
 local function setData(id, b)
-    write(id, fields.building, encode(b))
+    C.setDynWithUndo({id}, fields.building, encode(b))
     index(true)
 end
 
@@ -408,7 +473,7 @@ local function height(id)
 end
 
 local function reset()
-    cache, memory = {at = -math.huge, list = {}, byId = {}, byKey = {}}, {}
+    cache, memory = {at = -math.huge, gen = cache.gen, list = {}, byId = {}, byKey = {}}, {}
 end
 
 -- =============================================================================

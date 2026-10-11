@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - MeshRoad overlap
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -787,7 +787,6 @@ local function build(road, p, buildFn, cache)
         local other = built(nb, buildFn, cache)
         if other.solid then meshes = clipMeshes(meshes, other.solid, wins(road, nb)) end
     end
-    if #meshes == 0 then return nil, self.err end
     return meshes, self.err
 end
 

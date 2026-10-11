@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - MeshRoad gates
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -270,8 +270,9 @@ local function apply(resolved, spl, path, w, h, tan)
         add(math.max(sp.b - jambGap, sp.a), sp, false)
         add(sp.b, sp, true)
     end
+    for _, m in ipairs(marks) do m.q = math.floor(m.at * 1e9 + 0.5) end
     table.sort(marks, function(x, y)
-        if math.abs(x.at - y.at) > 1e-9 then return x.at < y.at end
+        if x.q ~= y.q then return x.q < y.q end
         return (x.sp and 1 or 0) < (y.sp and 1 or 0)
     end)
 

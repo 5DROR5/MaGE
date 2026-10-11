@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - Building Architect runtime fixes
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -65,6 +65,7 @@ local function wrapControl(control)
         local windows     = 0
         local fonts       = 0
         local inner       = 0
+        local ids         = 0
         local seen        = {}
 
         local function scoped(f, keyOf)
@@ -73,8 +74,10 @@ local function wrapControl(control)
                 local n   = (seen[key] or 0) + 1
                 seen[key] = n
                 im.PushID1('batFix_' .. key .. '_' .. n)
+                ids        = ids + 1
                 local c, r = pack(f(...))
                 im.PopID()
+                ids        = ids - 1
                 return unpack(r, 1, c)
             end
         end
@@ -111,6 +114,7 @@ local function wrapControl(control)
 
         local n, r = pack(xpcall(control, debug.traceback, ...))
 
+        for _ = 1, ids do im.PopID() end
         for _ = 1, fonts do origPop() end
         for _ = 1, windows do origEnd() end
 
@@ -128,8 +132,9 @@ end
 
 local function patchUi(UI)
     if type(UI.control) ~= 'function' then return end
-    UI.control  = wrapControl(UI.control)
-    patched[UI] = true
+    local orig  = UI.control
+    UI.control  = wrapControl(orig)
+    patched[UI] = {field = 'control', orig = orig, wrap = UI.control}
 end
 
 -- =============================================================================
@@ -146,7 +151,7 @@ end
 local function patchWorld(W)
     local onUpdate, forDesc, forScope = W.onUpdate, W.forDesc, W.forScope
     if type(onUpdate) ~= 'function' or type(forDesc) ~= 'function' or type(forScope) ~= 'function' then return end
-    W.onUpdate = function(...)
+    local function wrap(...)
         if not stale(forDesc, forScope) then return onUpdate(...) end
         local drag         = im.IsMouseDragging
         im.IsMouseDragging = function(button, ...)
@@ -158,7 +163,8 @@ local function patchWorld(W)
         if not r[1] then error(r[2], 0) end
         return unpack(r, 2, n)
     end
-    patched[W] = true
+    W.onUpdate = wrap
+    patched[W] = {field = 'onUpdate', orig = onUpdate, wrap = wrap}
 end
 
 -- =============================================================================
@@ -198,6 +204,10 @@ local function attach()
 end
 
 local function detach()
+    for mod, p in pairs(patched) do
+        if type(p) == 'table' and mod[p.field] == p.wrap then mod[p.field] = p.orig end
+        patched[mod] = nil
+    end
     if origRerequire and rerequire == hookRerequire then rerequire = origRerequire end
     origRerequire = nil
     hookRerequire = nil

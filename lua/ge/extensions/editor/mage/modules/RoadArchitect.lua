@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - Road Architect capture
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -35,6 +35,10 @@ local snapTerrain  = true
 -- =============================================================================
 -- CAPTURE
 -- =============================================================================
+
+local function pack(...)
+    return select('#', ...), {...}
+end
 
 local function proxyFor(real, onMesh)
     local proxy = {}
@@ -73,7 +77,7 @@ local function terrainRay(orig)
     end
 end
 
-local function capture(fn, ...)
+local function capture(fn, keep, ...)
     local parts = {}
     local orig  = createObject
     local ray   = castRayStatic
@@ -91,11 +95,12 @@ local function capture(fn, ...)
             end
         end)
     end
-    local ok, err = pcall(fn, ...)
+    local n, r    = pack(pcall(fn, ...))
     createObject  = orig
     castRayStatic = ray
-    if not ok then error(err, 0) end
-    return parts
+    if not r[1] then error(r[2], 0) end
+    keep(parts)
+    return unpack(r, 2, n)
 end
 
 local function hook(rm, key, make)
@@ -113,14 +118,16 @@ local function install()
 
     hook(rm, "createRoad", function(f)
         return function(r, ...)
-            local parts = capture(f, r, ...)
-            if type(r) == "table" and r.name then roads[r.name] = parts end
+            return capture(f, function(parts)
+                if type(r) == "table" and r.name then roads[r.name] = parts end
+            end, r, ...)
         end
     end)
     hook(rm, "updateBridge", function(f)
         return function(r, ...)
-            local parts = capture(f, r, ...)
-            if type(r) == "table" and r.name then bridges[r.name] = parts end
+            return capture(f, function(parts)
+                if type(r) == "table" and r.name then bridges[r.name] = parts end
+            end, r, ...)
         end
     end)
     hook(rm, "tryRemove", function(f)

@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - live preview
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -308,6 +308,10 @@ local function buildOne(road, overlapPlan, overlapCache)
     if not meshes then return false, err end
 
     removeMeshFor(road.id)
+    if #meshes == 0 then
+        for _, sid in ipairs(road.srcIds or {road.id}) do hideRoadOnce(sid) end
+        return true
+    end
     meshCtr    = meshCtr + 1
     local name = meshPrefix .. tostring(meshCtr) .. "_" .. tostring(road.id)
     local o    = createObject('ProceduralMesh')
@@ -528,22 +532,23 @@ local function convertSelection()
     local ids = selectedIds()
     if #ids == 0 then return "nothing selected" end
 
-    local changed, skipped = 0, 0
-    editor.history:beginTransaction("MageConvert")
+    local decals, meshes, skipped = {}, {}, 0
     for _, id in ipairs(ids) do
         local obj = scenetree.findObjectById(id)
         local cls = obj and obj:getClassName()
         if cls == "DecalRoad" and objField(obj, "material") ~= markerMaterial then
-            obj:setField("material", 0, markerMaterial)
-            changed = changed + 1
+            decals[#decals + 1] = id
         elseif cls == "MeshRoad" and mr.meshRoadIsTextured(obj) then
-            for _, key in ipairs(meshRoad.materialKeys) do
-                obj:setField(key, 0, markerMaterial)
-            end
-            changed = changed + 1
+            meshes[#meshes + 1] = id
         else
             skipped = skipped + 1
         end
+    end
+    local changed = #decals + #meshes
+    editor.history:beginTransaction("MageConvert")
+    if #decals > 0 then C.setFieldWithUndo(decals, "material", markerMaterial) end
+    if #meshes > 0 then
+        for _, key in ipairs(meshRoad.materialKeys) do C.setFieldWithUndo(meshes, key, markerMaterial) end
     end
     editor.history:endTransaction()
     editor.setDirty()

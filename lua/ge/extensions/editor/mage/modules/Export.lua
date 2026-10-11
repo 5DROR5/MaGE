@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - DAE file writer
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -546,14 +546,19 @@ local function update(ids, full)
     table.sort(order)
 
     local rebuilt, removed, placed, skipped, tris = 0, 0, 0, 0, 0
+    local failed                                  = {}
     for _, cell in ipairs(order) do
         local c       = byCell[cell]
         local entries = {}
         if c then
             table.sort(c.units, function(a, b) return a.key < b.key end)
             for _, u in ipairs(c.units) do
-                local meshes = O.build(u.road, plan, P.buildUnit, buildCache)
-                if meshes then
+                local meshes, err = O.build(u.road, plan, P.buildUnit, buildCache)
+                if not meshes then
+                    skipped      = skipped + 1
+                    failed[cell] = true
+                    log('W', logTag, "build failed for " .. tostring(u.key) .. ": " .. tostring(err))
+                else
                     local own, mods, mods2 = {}, {}, {}
                     for _, sm in ipairs(meshes) do
                         local list = (not sm.module and own) or (sm.uvs2 and mods2) or mods
@@ -564,12 +569,12 @@ local function update(ids, full)
                     if #mods2 > 0 then
                         entries[#entries + 1] = {road = {persistentId = u.key .. "_modules_uv"}, meshes = mods2, keepNormals = true, secondUv = true}
                     end
-                else
-                    skipped = skipped + 1
                 end
             end
         end
-        if #entries == 0 then
+        if failed[cell] then
+            log('W', logTag, "kept the previous build of area " .. cell)
+        elseif #entries == 0 then
             if removeCell(cell, levelPath) then removed = removed + 1 end
         else
             local origin    = {x = (c.ix + 0.5) * mr.daeCell, y = (c.iy + 0.5) * mr.daeCell}
@@ -604,7 +609,9 @@ local function update(ids, full)
     if (rebuilt + removed) > 0 then editor.setDirty() end
 
     local saved = {}
-    for key, u in pairs(units) do saved[key] = {cell = u.cell, sig = u.sig} end
+    for key, u in pairs(units) do
+        if not failed[u.cell] then saved[key] = {cell = u.cell, sig = u.sig} end
+    end
     local indexOk = C.writeJson(indexPath, {version = mr.indexVersion, config = cfgSig, units = saved})
 
     local status

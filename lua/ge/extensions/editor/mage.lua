@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - Map Geometry Engine
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -461,11 +461,6 @@ end
 
 local function loadConfig()
     loadConfigData()
-    local dir = levelDir()
-    if dir then
-        common.removeFile(dir .. common.styleFile .. ".tmp")
-        common.removeFile(dir .. common.legacyStyleFile .. ".tmp")
-    end
     preview.loadStyles()
 end
 
@@ -1034,8 +1029,8 @@ end
 
 local function writeField(id, fieldName, value)
     local legacy = common.legacyField(fieldName)
-    editor.setDynamicFieldValue(id, fieldName, value, 0)
-    if legacy and dynValue(id, legacy) then editor.setDynamicFieldValue(id, legacy, "", 0) end
+    common.setDynWithUndo({id}, fieldName, value)
+    if legacy and dynValue(id, legacy) then common.setDynWithUndo({id}, legacy, "") end
 end
 
 local function applyValue(fieldName, value, idsIn)

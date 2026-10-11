@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - shared helpers
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -161,7 +161,23 @@ local function hash(str)
 end
 
 local function writeJson(path, data)
-    return (pcall(jsonWriteFile, path, data, true))
+    local ok, res = pcall(jsonWriteFile, path, data, true)
+    return ok and res ~= false
+end
+
+local objectHistory = nil
+
+local function history()
+    objectHistory = objectHistory or require("editor/api/objectHistoryActions")()
+    return objectHistory
+end
+
+local function setDynWithUndo(ids, field, value)
+    history().changeObjectDynFieldWithUndo(ids, field, value, 0)
+end
+
+local function setFieldWithUndo(ids, field, value)
+    history().changeObjectFieldWithUndo(ids, field, value)
 end
 
 local function md5Prefix32(str)
@@ -188,14 +204,16 @@ M.fieldName   = fieldName
 M.legacyField = legacyField
 M.stylePathIn = stylePathIn
 
-M.fieldPrefix     = fieldPrefix
-M.styleFile       = styleFile
-M.legacyStyleFile = legacyStyleFile
-M.md5             = md5
-M.clamp           = clamp
-M.v3              = v3
-M.md5Prefix32     = md5Prefix32
-M.removeFile      = removeFile
-M.hash            = hash
+M.fieldPrefix      = fieldPrefix
+M.styleFile        = styleFile
+M.legacyStyleFile  = legacyStyleFile
+M.md5              = md5
+M.clamp            = clamp
+M.v3               = v3
+M.md5Prefix32      = md5Prefix32
+M.removeFile       = removeFile
+M.hash             = hash
+M.setDynWithUndo   = setDynWithUndo
+M.setFieldWithUndo = setFieldWithUndo
 
 return M
