@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  MaGE is the new version of Sidewalk PIT. Everything is built inside the game, no Blender and no Python.
+  Everything is built inside the game, no Blender and no Python.
 </p>
 
 ---
