@@ -1,0 +1,443 @@
+{
+  "mage_brick_herringbone": {
+    "name": "mage_brick_herringbone",
+    "mapTo": "mage_brick_herringbone",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/brick/t_bricks_herringbone_01/t_bricks_herringbone_01_ao.data.png",
+        "baseColorMap": "/assets/materials/tileable/brick/t_bricks_herringbone_01/t_bricks_herringbone_01_b.color.png",
+        "detailBaseColorMapStrength": 0,
+        "detailMap": "/assets/materials/tileable/brick/brick_herringbone/t_grunge_detail1_b.data.png",
+        "detailScale": [
+          0.25,
+          0.25
+        ],
+        "normalMap": "/assets/materials/tileable/brick/t_bricks_herringbone_01/t_bricks_herringbone_01_nm.normal.png",
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/tileable/brick/t_bricks_herringbone_01/t_bricks_herringbone_01_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "SIDEWALK",
+    "materialTag0": "beamng",
+    "materialTag1": "building",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_brick_painted": {
+    "name": "mage_brick_painted",
+    "mapTo": "mage_brick_painted",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/brick/t_brick_white_paint_01/t_brick_white_paint_01_ao.data.png",
+        "baseColorMap": "/assets/materials/tileable/brick/t_brick_white_paint_01/t_brick_white_paint_01_b.color.png",
+        "detailBaseColorMapStrength": 0.5,
+        "detailMap": "/assets/materials/trim/concrete/tunnel/t_tunnel_detail_b.data.png",
+        "detailRoughnessMapStrength": 0.300000012,
+        "detailScale": [
+          0.100000001,
+          0.0500000007
+        ],
+        "normalMap": "/assets/materials/tileable/brick/t_brick_white_paint_01/t_brick_white_paint_01_nm.normal.png",
+        "normalMapStrength": 0.5,
+        "pixelSpecular": true,
+        "roughnessDetailMap": "/assets/materials/breakup/t_detail_concrete_02/t_detail_concrete_02_r.data.png",
+        "roughnessMap": "/assets/materials/tileable/brick/t_brick_white_paint_01/t_brick_white_paint_01_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "BUILDINGS",
+    "materialTag0": "beamng",
+    "materialTag1": "building",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_stone_brick_regular": {
+    "name": "mage_stone_brick_regular",
+    "mapTo": "mage_stone_brick_regular",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/brick/stone_brick_regular/t_stone_brick_regular_ao.data.png",
+        "baseColorMap": "/assets/materials/tileable/brick/stone_brick_regular/t_stone_brick_regular_b.color.png",
+        "detailNormalMap": "/assets/materials/breakup/curbs/t_asphalt_detail_04.normal.png",
+        "detailNormalMapStrength": 0.5,
+        "normalMap": "/assets/materials/tileable/brick/stone_brick_regular/t_stone_brick_regular_nm.normal.png",
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/tileable/brick/stone_brick_regular/t_stone_brick_regular_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "BUILDINGS",
+    "materialTag0": "beamng",
+    "materialTag1": "building",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_tiles_marble_square": {
+    "name": "mage_tiles_marble_square",
+    "mapTo": "mage_tiles_marble_square",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/marble/tiles_marble_square/t_tiles_marble_square_ao.data.png",
+        "baseColorMap": "/assets/materials/tileable/marble/tiles_marble_square/t_tiles_marble_square_b.color.png",
+        "normalMap": "/assets/materials/tileable/marble/tiles_marble_square/t_tiles_marble_square_nm.normal.png",
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/tileable/marble/tiles_marble_square/t_tiles_marble_square_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "BUILDINGS",
+    "dynamicCubemap": true,
+    "materialTag0": "beamng",
+    "materialTag1": "building",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_curbs": {
+    "name": "mage_curbs",
+    "mapTo": "mage_curbs",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/trim/concrete/curbs/t_curbs_ao.data.png",
+        "baseColorMap": "/assets/materials/trim/concrete/curbs/t_curbs_b.color.png",
+        "detailNormalMap": "/assets/materials/breakup/curbs/t_asphalt_detail_04.normal.png",
+        "detailScale": [
+          1.5,
+          0.75
+        ],
+        "normalMap": "/assets/materials/trim/concrete/curbs/t_curbs_nm.normal.png",
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/trim/concrete/curbs/t_curbs_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "SIDEWALK",
+    "materialTag0": "beamng",
+    "materialTag1": "vehicle",
+    "translucent": true,
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_retainingwall": {
+    "name": "mage_retainingwall",
+    "mapTo": "mage_retainingwall",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/concrete/retainingwall/t_retainingwall_ao.data.png",
+        "baseColorMap": "/assets/materials/tileable/concrete/retainingwall/t_retainingwall_b.color.png",
+        "normalMap": "/assets/materials/tileable/concrete/retainingwall/t_retainingwall_nm.normal.png",
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/tileable/concrete/retainingwall/t_retainingwall_r.data.png",
+        "vertColor": true
+      },
+      {
+        "detailScale": [
+          8,
+          2
+        ]
+      },
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "BUILDINGS",
+    "materialTag0": "beamng",
+    "materialTag1": "vehicle",
+    "translucent": true,
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_sidewalk1": {
+    "name": "mage_sidewalk1",
+    "mapTo": "mage_sidewalk1",
+    "class": "Material",
+    "Stages": [
+      {
+        "baseColorFactor": [
+          0.745097995,
+          0.745097995,
+          0.745097995,
+          1
+        ],
+        "baseColorMap": "/assets/materials/tileable/concrete/sidewalk1/t_sidewalk1_b.color.png",
+        "metallicFactor": 0.699999988,
+        "metallicMap": "/assets/materials/tileable/concrete/sidewalk1/t_sidewalk1_m.data.png",
+        "normalMap": "/assets/materials/tileable/concrete/sidewalk1/t_sidewalk1_nm.normal.png",
+        "normalMapStrength": 1.20000005,
+        "pixelSpecular": true,
+        "roughnessMap": "/assets/materials/tileable/concrete/sidewalk1/t_sidewalk1_r.data.png",
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "alphaRef": 0,
+    "annotation": "SIDEWALK",
+    "dynamicCubemap": true,
+    "groundType": "CONCRETE",
+    "materialTag0": "beamng",
+    "materialTag1": "road",
+    "translucent": true,
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_m_asphalt_factory_01": {
+    "name": "mage_m_asphalt_factory_01",
+    "mapTo": "mage_m_asphalt_factory_01",
+    "class": "Material",
+    "Stages": [
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_asphalt_old_ao.data.png",
+        "baseColorFactor": [
+          0.999989986,
+          0.99999702,
+          1,
+          1
+        ],
+        "baseColorMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_asphalt_old_b.color.png",
+        "detailMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_concrete_detail.data.png",
+        "detailNormalMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_concrete_nm.normal.png",
+        "detailNormalMapStrength": 0.349999994,
+        "detailScale": [
+          0.0700000003,
+          0.0700000003
+        ],
+        "normalMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_asphalt_old_nm.normal.png",
+        "roughnessMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_asphalt_old_r.data.png",
+        "vertColor": true
+      },
+      {
+        "ambientOcclusionMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_asphalt_old_ao.data.png",
+        "ambientOcclusionMapUseUV": 1,
+        "baseColorFactor": [
+          0.912209988,
+          0.912200987,
+          0.912200987,
+          1
+        ],
+        "baseColorMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_asphalt_old_02_b.color.png",
+        "diffuseMapUseUV": 1,
+        "normalMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_asphalt_old_nm.normal.png",
+        "normalMapStrength": 5,
+        "normalMapUseUV": 1,
+        "opacityFactor": 0.298000008,
+        "roughnessMap": "/assets/materials/tileable/road/m_asphalt_factory_01/t_macro_asphalt_old_r.data.png",
+        "roughnessMapUseUV": 1
+      },
+      {},
+      {}
+    ],
+    "activeLayers": 2,
+    "annotation": "ASPHALT",
+    "groundType": "ASPHALT_OLD",
+    "translucentBlendOp": "None",
+    "version": 1.5
+  },
+  "mage_it_concrete_roadside_walls": {
+    "name": "mage_it_concrete_roadside_walls",
+    "mapTo": "mage_it_concrete_roadside_walls",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/tileable/concrete/it_concrete_roadside_walls/it_concrete_roadside_walls_d.dds",
+        "detailScale": [
+          0.300000012,
+          0.300000012
+        ],
+        "normalMap": "/assets/materials/tileable/concrete/it_concrete_roadside_walls/it_concrete_roadside_walls_n.dds",
+        "specularMap": "/assets/materials/tileable/concrete/it_concrete_roadside_walls/it_concrete_roadside_walls_s.dds",
+        "useAnisotropic": true,
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "annotation": "BUILDINGS",
+    "groundType": "ASPHALT_OLD",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "translucentBlendOp": "None"
+  },
+  "mage_italy_cobblestone": {
+    "name": "mage_italy_cobblestone",
+    "mapTo": "mage_italy_cobblestone",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/tileable/stone/italy_cobblestone/italy_cobblestone_d.dds",
+        "detailNormalMapStrength": 0.5,
+        "detailScale": [
+          0.400000006,
+          0.400000006
+        ],
+        "diffuseColor": [
+          0.99607801437378,
+          0.99607801437378,
+          0.99607801437378,
+          1
+        ],
+        "normalMap": "/assets/materials/tileable/stone/italy_cobblestone/italy_cobblestone_n.dds",
+        "specular": [
+          0.99607801437378,
+          0.99607801437378,
+          0.99607801437378,
+          1
+        ],
+        "specularMap": "/assets/materials/tileable/stone/italy_cobblestone/italy_cobblestone_s.dds",
+        "specularPower": 19,
+        "useAnisotropic": true,
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "COBBLESTONE",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "specularStrength0": "0.490196",
+    "translucentBlendOp": "None"
+  },
+  "mage_italy_cobblestone_patterned": {
+    "name": "mage_italy_cobblestone_patterned",
+    "mapTo": "mage_italy_cobblestone_patterned",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/tileable/stone/italy_cobblestone_patterned/italy_cobblestone_patterned_d.dds",
+        "detailNormalMapStrength": 0.5,
+        "detailScale": [
+          0.400000006,
+          0.400000006
+        ],
+        "diffuseColor": [
+          0.99607801437378,
+          0.99607801437378,
+          0.99607801437378,
+          1
+        ],
+        "normalMap": "/assets/materials/tileable/stone/italy_cobblestone_patterned/italy_cobblestone_patterned_n.dds",
+        "specular": [
+          0.99607801437378,
+          0.99607801437378,
+          0.99607801437378,
+          1
+        ],
+        "specularMap": "/assets/materials/tileable/stone/italy_cobblestone_patterned/italy_cobblestone_patterned_s.dds",
+        "specularPower": 19,
+        "useAnisotropic": true,
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "COBBLESTONE",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "translucentBlendOp": "None"
+  },
+  "mage_italy_concrete_sidewalk": {
+    "name": "mage_italy_concrete_sidewalk",
+    "mapTo": "mage_italy_concrete_sidewalk",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/tileable/tile/italy_concrete_sidewalk/italy_concrete_sidewalk_d.dds",
+        "detailScale": [
+          6,
+          6
+        ],
+        "normalMap": "/assets/materials/tileable/tile/italy_concrete_sidewalk/italy_concrete_sidewalk_n.dds",
+        "specularMap": "/assets/materials/tileable/tile/italy_concrete_sidewalk/italy_concrete_sidewalk_s.dds",
+        "useAnisotropic": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT_OLD",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "translucentBlendOp": "None"
+  },
+  "mage_italy_curb_concrete": {
+    "name": "mage_italy_curb_concrete",
+    "mapTo": "mage_italy_curb_concrete",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/trim/concrete/italy_curb_concrete/italy_curb_concrete_d.dds",
+        "detailScale": [
+          6,
+          6
+        ],
+        "normalMap": "/assets/materials/trim/concrete/italy_curb_concrete/italy_curb_concrete_n.dds",
+        "specularMap": "/assets/materials/trim/concrete/italy_curb_concrete/italy_curb_concrete_s.dds",
+        "useAnisotropic": true,
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "annotation": "SIDEWALK",
+    "groundType": "ASPHALT_OLD",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "translucentBlendOp": "None"
+  },
+  "mage_italy_sidewalk_tiles_2": {
+    "name": "mage_italy_sidewalk_tiles_2",
+    "mapTo": "mage_italy_sidewalk_tiles_2",
+    "class": "Material",
+    "Stages": [
+      {
+        "colorMap": "/assets/materials/tileable/tile/italy_sidewalk_tiles_2/italy_sidewalk_tiles_2_d.dds",
+        "detailScale": [
+          6,
+          6
+        ],
+        "normalMap": "/assets/materials/tileable/tile/italy_sidewalk_tiles_2/italy_sidewalk_tiles_2_n.dds",
+        "specularMap": "/assets/materials/tileable/tile/italy_sidewalk_tiles_2/italy_sidewalk_tiles_2_s.dds",
+        "useAnisotropic": true,
+        "vertColor": true
+      },
+      {},
+      {},
+      {}
+    ],
+    "groundType": "ASPHALT_OLD",
+    "materialTag0": "beamng",
+    "materialTag1": "italy",
+    "translucentBlendOp": "None"
+  }
+}

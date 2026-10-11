@@ -1,0 +1,565 @@
+{
+  "curb": {
+    "material": "mage_curbs",
+    "meshroadMaterial": "mage_retainingwall",
+    "styles": {
+      "green": {
+        "band": 7,
+        "color": [
+          0.24,
+          0.62,
+          0.32
+        ],
+        "label": "green MON-SAT",
+        "weight": 3
+      },
+      "grey": {
+        "band": 0,
+        "color": [
+          0.62,
+          0.62,
+          0.6
+        ],
+        "label": "grey",
+        "weight": 27
+      },
+      "grey2": {
+        "band": 1,
+        "color": [
+          0.74,
+          0.74,
+          0.72
+        ],
+        "label": "light grey",
+        "weight": 27
+      },
+      "grey3": {
+        "band": 2,
+        "color": [
+          0.48,
+          0.48,
+          0.47
+        ],
+        "label": "dark grey",
+        "weight": 26
+      },
+      "mixed": {
+        "avoidRepeat": true,
+        "color": [
+          0.45,
+          0.55,
+          0.75
+        ],
+        "label": "alternating",
+        "segment": [
+          6,
+          18
+        ],
+        "sequence": [
+          "grey",
+          "grey2",
+          "grey3",
+          "red",
+          "red2",
+          "yellow",
+          "white",
+          "green"
+        ]
+      },
+      "red": {
+        "band": 3,
+        "color": [
+          0.72,
+          0.18,
+          0.16
+        ],
+        "label": "red",
+        "weight": 5
+      },
+      "red2": {
+        "band": 4,
+        "color": [
+          0.85,
+          0.32,
+          0.26
+        ],
+        "label": "light red",
+        "weight": 5
+      },
+      "white": {
+        "band": 6,
+        "color": [
+          0.92,
+          0.92,
+          0.9
+        ],
+        "label": "white + lettering",
+        "weight": 3
+      },
+      "yellow": {
+        "band": 5,
+        "color": [
+          0.9,
+          0.75,
+          0.15
+        ],
+        "label": "yellow TOW AWAY",
+        "weight": 4
+      }
+    }
+  },
+  "defaultScale": 2.5,
+  "materials": {
+    "cladding_zinc": {
+      "scale": [
+        2.05,
+        2.06
+      ]
+    },
+    "concrete_plain": {
+      "scale": [
+        20.74,
+        5.41
+      ]
+    },
+    "ind_concrete": {
+      "scale": [
+        2.05,
+        2.06
+      ]
+    },
+    "italy_bld_big_flat_bricks_row": {
+      "scale": [
+        4.22,
+        4.19
+      ]
+    },
+    "italy_bld_concrete": {
+      "scale": [
+        1,
+        1
+      ]
+    },
+    "italy_bld_old_bricks": {
+      "scale": [
+        5,
+        5
+      ]
+    },
+    "italy_bld_old_concrete": {
+      "scale": [
+        2.01,
+        2.01
+      ]
+    },
+    "italy_sidewalk_tiles": {
+      "scale": [
+        3.01,
+        1.5
+      ]
+    },
+    "italy_terrain_dirt": {
+      "scale": [
+        7.41,
+        7.41
+      ]
+    },
+    "mage_brick_herringbone": {
+      "scale": [
+        2.02,
+        2.02
+      ]
+    },
+    "mage_brick_painted": {
+      "scale": [
+        2,
+        2
+      ]
+    },
+    "mage_curbs": {
+      "atlas": "curbs8",
+      "scale": [
+        5.89,
+        2.9
+      ]
+    },
+    "mage_it_concrete_roadside_walls": {
+      "scale": [
+        4.22,
+        4.19
+      ]
+    },
+    "mage_italy_cobblestone": {
+      "scale": [
+        1.01,
+        1.01
+      ]
+    },
+    "mage_italy_cobblestone_patterned": {
+      "scale": [
+        2.05,
+        2.06
+      ]
+    },
+    "mage_italy_concrete_sidewalk": {
+      "scale": [
+        2,
+        4.01
+      ]
+    },
+    "mage_italy_curb_concrete": {
+      "scale": [
+        4.06,
+        1.02
+      ]
+    },
+    "mage_italy_sidewalk_tiles_2": {
+      "scale": [
+        2,
+        2
+      ]
+    },
+    "mage_m_asphalt_factory_01": {
+      "scale": [
+        5,
+        5
+      ]
+    },
+    "mage_retainingwall": {
+      "scale": [
+        9.11,
+        8
+      ]
+    },
+    "mage_sidewalk1": {
+      "scale": [
+        16.88,
+        4.22
+      ]
+    },
+    "mage_stone_brick_regular": {
+      "scale": [
+        2,
+        2
+      ]
+    },
+    "mage_tiles_marble_square": {
+      "scale": [
+        4,
+        4.09
+      ]
+    },
+    "slabs_large": {
+      "scale": [
+        8.39,
+        4.19
+      ]
+    },
+    "slabs_marble": {
+      "scale": [
+        5.12,
+        5.13
+      ]
+    }
+  },
+  "walk": {
+    "styles": {
+      "asphalt": {
+        "color": [
+          0.55,
+          0.55,
+          0.58
+        ],
+        "label": "asphalt",
+        "material": "mage_m_asphalt_factory_01",
+        "weight": 0
+      },
+      "brick_herringbone": {
+        "color": [
+          0.62,
+          0.38,
+          0.3
+        ],
+        "label": "brick",
+        "material": "mage_brick_herringbone",
+        "weight": 13
+      },
+      "brick_painted": {
+        "color": [
+          0.72,
+          0.52,
+          0.45
+        ],
+        "label": "painted brick",
+        "material": "mage_brick_painted",
+        "weight": 0
+      },
+      "city_tiles": {
+        "color": [
+          0.72,
+          0.7,
+          0.66
+        ],
+        "label": "city paving",
+        "material": "italy_sidewalk_tiles",
+        "weight": 0
+      },
+      "cobble": {
+        "color": [
+          0.55,
+          0.53,
+          0.5
+        ],
+        "label": "cobblestone",
+        "material": "mage_italy_cobblestone",
+        "weight": 0
+      },
+      "cobble_pattern": {
+        "color": [
+          0.6,
+          0.57,
+          0.53
+        ],
+        "label": "patterned cobblestone",
+        "material": "mage_italy_cobblestone_patterned",
+        "weight": 0
+      },
+      "concrete_plain": {
+        "color": [
+          0.74,
+          0.73,
+          0.7
+        ],
+        "label": "poured concrete",
+        "material": "concrete_plain",
+        "weight": 0
+      },
+      "dirt": {
+        "color": [
+          0.52,
+          0.44,
+          0.34
+        ],
+        "label": "dirt",
+        "material": "italy_terrain_dirt",
+        "weight": 0
+      },
+      "italy_concrete": {
+        "color": [
+          0.74,
+          0.73,
+          0.7
+        ],
+        "label": "poured concrete",
+        "material": "mage_italy_concrete_sidewalk",
+        "weight": 0
+      },
+      "mixed": {
+        "avoidRepeat": true,
+        "color": [
+          0.45,
+          0.55,
+          0.75
+        ],
+        "label": "alternating",
+        "segment": [
+          14,
+          40
+        ],
+        "sequence": [
+          "slabs_large",
+          "tiles_marble_square",
+          "sidewalk1",
+          "brick_herringbone"
+        ]
+      },
+      "new_concrete": {
+        "color": [
+          0.76,
+          0.75,
+          0.72
+        ],
+        "label": "new concrete",
+        "material": "italy_bld_concrete",
+        "weight": 0
+      },
+      "old_concrete": {
+        "color": [
+          0.66,
+          0.63,
+          0.58
+        ],
+        "label": "old concrete",
+        "material": "italy_bld_old_concrete",
+        "weight": 0
+      },
+      "rural_tiles": {
+        "color": [
+          0.68,
+          0.66,
+          0.62
+        ],
+        "label": "rural paving",
+        "material": "mage_italy_sidewalk_tiles_2",
+        "weight": 0
+      },
+      "sidewalk1": {
+        "color": [
+          0.7,
+          0.7,
+          0.68
+        ],
+        "label": "concrete",
+        "material": "mage_sidewalk1",
+        "weight": 15
+      },
+      "slabs_large": {
+        "color": [
+          0.66,
+          0.64,
+          0.6
+        ],
+        "label": "large slabs",
+        "material": "slabs_large",
+        "weight": 38
+      },
+      "slabs_marble": {
+        "color": [
+          0.82,
+          0.8,
+          0.78
+        ],
+        "label": "large marble",
+        "material": "slabs_marble",
+        "weight": 0
+      },
+      "stone_brick_regular": {
+        "color": [
+          0.58,
+          0.56,
+          0.52
+        ],
+        "label": "stone",
+        "material": "mage_stone_brick_regular",
+        "weight": 0
+      },
+      "tiles_marble_square": {
+        "color": [
+          0.8,
+          0.78,
+          0.74
+        ],
+        "label": "marble",
+        "material": "mage_tiles_marble_square",
+        "weight": 34
+      }
+    }
+  },
+  "wall": {
+    "styles": {
+      "brick": {
+        "color": [
+          0.62,
+          0.38,
+          0.3
+        ],
+        "label": "brick",
+        "material": "mage_brick_herringbone"
+      },
+      "cladding_zinc": {
+        "color": [
+          0.6,
+          0.62,
+          0.64
+        ],
+        "label": "zinc cladding",
+        "material": "cladding_zinc"
+      },
+      "concrete": {
+        "color": [
+          0.74,
+          0.73,
+          0.7
+        ],
+        "label": "poured concrete",
+        "material": "concrete_plain",
+        "scale": [
+          4.22,
+          4.19
+        ]
+      },
+      "curb_concrete": {
+        "color": [
+          0.66,
+          0.64,
+          0.6
+        ],
+        "label": "curb concrete",
+        "material": "mage_italy_curb_concrete"
+      },
+      "flat_bricks_row": {
+        "color": [
+          0.8,
+          0.8,
+          0.78
+        ],
+        "label": "concrete panels",
+        "material": "italy_bld_big_flat_bricks_row"
+      },
+      "ind_concrete": {
+        "color": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "label": "industrial concrete",
+        "material": "ind_concrete"
+      },
+      "old_bricks": {
+        "color": [
+          0.62,
+          0.5,
+          0.4
+        ],
+        "label": "old bricks",
+        "material": "italy_bld_old_bricks"
+      },
+      "old_concrete": {
+        "color": [
+          0.66,
+          0.63,
+          0.58
+        ],
+        "label": "old concrete",
+        "material": "italy_bld_old_concrete"
+      },
+      "retaining": {
+        "color": [
+          0.62,
+          0.6,
+          0.57
+        ],
+        "label": "retaining wall",
+        "material": "mage_retainingwall"
+      },
+      "roadside": {
+        "color": [
+          0.72,
+          0.71,
+          0.68
+        ],
+        "label": "concrete wall",
+        "material": "mage_it_concrete_roadside_walls"
+      },
+      "stone": {
+        "color": [
+          0.58,
+          0.56,
+          0.52
+        ],
+        "label": "stone",
+        "material": "mage_stone_brick_regular"
+      }
+    }
+  }
+}
