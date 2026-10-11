@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="images/logo_White.png">
+    <img src="images/logo_Black.png" alt="MaGE - Map Geometry Engine" width="320">
+  </picture>
+</p>
+
 <h1 align="center">MaGE - Map Geometry Engine</h1>
 
 <p align="center">
