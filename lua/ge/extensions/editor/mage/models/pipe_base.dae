@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><authoring_tool>MaGE model</authoring_tool></contributor><unit name="meter" meter="1"/><up_axis>Z_UP</up_axis></asset>
+  <library_effects>
+    <effect id="mage_tint_565555_italy_bld_metal-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+    <effect id="mage_tint_565555_italy_bld_trim_metal-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="mage_tint_565555_italy_bld_metal-material" name="mage_tint_565555_italy_bld_metal"><instance_effect url="#mage_tint_565555_italy_bld_metal-effect"/></material>
+    <material id="mage_tint_565555_italy_bld_trim_metal-material" name="mage_tint_565555_italy_bld_trim_metal"><instance_effect url="#mage_tint_565555_italy_bld_trim_metal-effect"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="pipe_base" name="pipe_base"><mesh>
+      <source id="pipe_base-positions"><float_array id="pipe_base-positions-array" count="54">0.000398 0.152039 0 -0.042903 0.127039 0 -0.042903 0.127039 0.255487 0.000398 0.152039 0.255487 0.0437 0.127039 0 0.043699 0.127039 0.255487 0.043699 0.077039 0 0.0437 0.077039 0.255487 0.000398 0.052039 0 0.000398 0.052039 0.255487 -0.042903 0.077039 0 -0.042903 0.077039 0.255487 -0.042903 0.077039 0.295487 -0.042903 0.127039 0.295487 0.000398 0.052039 0.295487 0.043699 0.077039 0.295487 0.0437 0.127039 0.295487 0.000398 0.152039 0.295487</float_array>
+        <technique_common><accessor source="#pipe_base-positions-array" count="18" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="pipe_base-normals"><float_array id="pipe_base-normals-array" count="54">0.000003 1 0.000001 -0.866026 0.499999 0 -0.866026 0.499999 -0.000001 0.000003 1 -0.000002 0.866027 0.499997 0.000001 0.866027 0.499997 -0.000001 0.866026 -0.499999 -0.000001 0.866026 -0.499998 0.000001 0.000004 -1 -0.000001 0.000004 -1 0.000002 -0.866025 -0.500001 0 -0.866024 -0.500002 0.000001 -0.866025 -0.5 0.000001 -0.866025 0.500001 -0.000001 0.000004 -1 0.000005 0.866026 -0.499999 0.000003 0.866027 0.499996 -0.000003 0.000004 1 -0.000005</float_array>
+        <technique_common><accessor source="#pipe_base-normals-array" count="18" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="pipe_base-colors"><float_array id="pipe_base-colors-array" count="54">0.371906 0.371242 0.382153 0.328036 0.32513 0.328118 0.347491 0.345153 0.350591 0.381553 0.380808 0.392024 0.377808 0.377047 0.388027 0.368406 0.366822 0.375248 0.344076 0.340491 0.342622 0.327047 0.321738 0.318649 0.310684 0.303023 0.293167 0.296654 0.288647 0.277188 0.301161 0.294115 0.285299 0.298845 0.293361 0.288353 0.315749 0.310939 0.308517 0.370606 0.368441 0.375532 0.286334 0.278661 0.267504 0.310485 0.303489 0.295297 0.353907 0.351091 0.355668 0.383804 0.382958 0.394039</float_array>
+        <technique_common><accessor source="#pipe_base-colors-array" count="18" stride="3"><param name="R" type="float"/><param name="G" type="float"/><param name="B" type="float"/></accessor></technique_common></source>
+      <source id="pipe_base-uv0"><float_array id="pipe_base-uv0-array" count="56">0.191335 2.999728 0.153481 2.999728 0.153481 3.190764 0.191335 3.190764 0.230605 2.999728 0.230605 3.190764 0.26756 2.999728 0.26756 3.190764 0.304895 2.999728 0.304895 3.190764 0.33973 2.999728 0.33973 3.190764 0.118647 2.999729 0.118647 3.190764 0.488022 0.863054 0.488021 0.907889 0.52444 0.907889 0.52444 0.863054 0.488021 0.626 0.488021 0.670836 0.52444 0.670836 0.52444 0.626 0.488021 0.71889 0.52444 0.71889 0.488021 0.766945 0.52444 0.766945 0.488021 0.814998 0.52444 0.814999</float_array>
+        <technique_common><accessor source="#pipe_base-uv0-array" count="28" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <source id="pipe_base-uv1"><float_array id="pipe_base-uv1-array" count="18">-0.102452 0.115849 -0.0375 0.196651 -0.102453 0.115848 -0.064952 0.019199 0.0375 0.00335 0.0375 0.003349 0.102452 0.08415 0.064952 0.180801 0.064952 0.180802</float_array>
+        <technique_common><accessor source="#pipe_base-uv1-array" count="9" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <vertices id="pipe_base-vertices"><input semantic="POSITION" source="#pipe_base-positions"/></vertices>
+      <triangles material="mage_tint_565555_italy_bld_metal" count="36">
+        <input semantic="VERTEX" source="#pipe_base-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#pipe_base-normals" offset="1"/>
+        <input semantic="COLOR" source="#pipe_base-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_base-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_base-uv1" offset="4" set="1"/>
+        <p>0 0 0 0 0 1 1 1 1 1 2 2 2 2 1 2 2 2 2 1 3 3 3 3 2 0 0 0 0 0 4 4 4 4 3 0 0 0 0 0 3 3 3 3 2 3 3 3 3 2 5 5 5 5 3 4 4 4 4 3 6 6 6 6 4 4 4 4 4 3 5 5 5 5 3 5 5 5 5 3 7 7 7 7 5 6 6 6 6 4 8 8 8 8 6 6 6 6 6 4 7 7 7 7 5 7 7 7 7 5 9 9 9 9 6 8 8 8 8 6 10 10 10 10 7 8 8 8 8 6 9 9 9 9 6 9 9 9 9 6 11 11 11 11 7 10 10 10 10 7 1 1 1 1 1 10 10 10 12 7 11 11 11 13 7 11 11 11 13 7 2 2 2 2 1 1 1 1 1 1</p>
+      </triangles>
+      <triangles material="mage_tint_565555_italy_bld_trim_metal" count="36">
+        <input semantic="VERTEX" source="#pipe_base-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#pipe_base-normals" offset="1"/>
+        <input semantic="COLOR" source="#pipe_base-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_base-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_base-uv1" offset="4" set="1"/>
+        <p>2 2 2 14 1 11 11 11 15 7 12 12 12 16 8 12 12 12 16 8 13 13 13 17 1 2 2 2 14 1 11 11 11 18 7 9 9 9 19 6 14 14 14 20 6 14 14 14 20 6 12 12 12 21 8 11 11 11 18 7 9 9 9 19 6 7 7 7 22 5 15 15 15 23 4 15 15 15 23 4 14 14 14 20 6 9 9 9 19 6 7 7 7 22 5 5 5 5 24 3 16 16 16 25 3 16 16 16 25 3 15 15 15 23 4 7 7 7 22 5 5 5 5 24 3 3 3 3 26 2 17 17 17 27 0 17 17 17 27 0 16 16 16 25 3 5 5 5 24 3 3 3 3 26 2 2 2 2 14 1 13 13 13 17 1 13 13 13 17 1 17 17 17 27 0 3 3 3 26 2</p>
+      </triangles>
+    </mesh></geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="Scene" name="Scene"><node id="node-base00" name="base00"><node id="node-start01" name="start01">
+    <node id="node-pipe_base" name="pipe_base_a40"><instance_geometry url="#pipe_base"><bind_material><technique_common><instance_material symbol="mage_tint_565555_italy_bld_metal" target="#mage_tint_565555_italy_bld_metal-material"/><instance_material symbol="mage_tint_565555_italy_bld_trim_metal" target="#mage_tint_565555_italy_bld_trim_metal-material"/></technique_common></bind_material></instance_geometry></node>
+  </node><node id="node-nulldetail" name="nulldetail8"/></node></visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#Scene"/></scene>
+</COLLADA>

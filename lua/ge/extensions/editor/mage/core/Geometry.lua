@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - geometry builder
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -18,11 +18,48 @@ local C           = require("editor/mage/core/Common")
 local Gate        = require("editor/mage/core/Gate")
 local Window      = require("editor/mage/core/Window")
 local Modules     = require("editor/mage/core/Modules")
+local Ornament    = require("editor/mage/core/Ornament")
+local Roof        = require("editor/mage/core/Roof")
+local Texture     = require("editor/mage/core/Texture")
 local clamp       = C.clamp
 local levelDir    = C.levelDir
 local md5Prefix32 = C.md5Prefix32
-local readJson    = C.readJson
 local v3          = C.v3
+
+-- =============================================================================
+-- CURB SIZES
+-- =============================================================================
+
+local curb = {height = S.height, strip = S.curbStrip, tip = roundEnd.tipWidth}
+
+local function setCurb(d)
+    d            = d or {}
+    curb.height  = d.height or S.height
+    curb.strip   = d.strip or S.curbStrip
+    curb.tip     = d.tip or roundEnd.tipWidth
+    curb.angle   = d.angle
+    curb.exposed = d.exposed
+end
+
+local curbLimits = {height = {0.02, 2.0}, strip = {0.02, 2.0}, angle = {0.0, 80.0}, exposed = {0.0, 2.0}, corner = {0.0, 10.0}, tip = {0.05, 5.0}}
+
+local function curbDimsOf(str)
+    if type(str) ~= "string" or str == "" then return nil end
+    local ok, d = pcall(jsonDecode, str)
+    if not ok or type(d) ~= "table" then return nil end
+    local out = {}
+    for k, l in pairs(curbLimits) do
+        local v = tonumber(d[k])
+        if v then out[k] = clamp(v, l[1], l[2]) end
+    end
+    return next(out) and out or nil
+end
+
+local function profileOf(name, fallback)
+    local p = S.curbProfiles[name] or S.curbProfiles[fallback]
+    if not (curb.angle or curb.exposed) or name == "flat" then return p end
+    return {angle = curb.angle or p.angle, exposed = curb.exposed or p.exposed}
+end
 
 -- =============================================================================
 -- STATE
@@ -31,7 +68,7 @@ local v3          = C.v3
 local styleFile = C.styleFile
 
 local mrState = {turnScale = 1.0, up = nil, curbMat = nil, wallStyle = nil,
-                 curbBand0 = false, note = nil, orient = false}
+                 curbBand0 = false, note = nil, orient = false, vBase = 0.0}
 
 local mr       = {}
 local features = {}
@@ -46,13 +83,12 @@ local curbKey, walkKey = nil, nil
 -- STYLES
 -- =============================================================================
 
-
 local function loadStyles()
     styleCfg, styleErr = nil, nil
     local dir          = levelDir()
     if not dir then styleErr = "no level loaded" return end
     stylePath  = C.stylePathIn(dir)
-    local data = readJson(stylePath)
+    local data = C.readStyles(stylePath)
     if not data then
         styleErr = "no styles config in this level"
         return
@@ -64,9 +100,8 @@ end
 
 local function orderedStyleNames(axis)
     local styles = styleCfg and styleCfg[axis] and styleCfg[axis].styles
-    if type(styles) ~= "table" then return {} end
-    local out = {}
-    for nm in pairs(styles) do out[#out + 1] = nm end
+    local out    = {}
+    for nm in pairs(styles or {}) do out[#out + 1] = nm end
     table.sort(out)
     return out
 end
@@ -74,7 +109,11 @@ end
 local function weightedPick(axis, weights, names, key)
     local total = 0
     for _, nm in ipairs(names) do total = total + (weights[nm] or 0) end
-    if total <= 0 then return names[1] end
+    if total <= 0 then
+        local pin = styleCfg and styleCfg[axis] and styleCfg[axis].default
+        if pin and weights[pin] then return pin end
+        return names[1]
+    end
     local seed = (styleCfg and styleCfg.seed) or 20260812
     local raw  = tostring(seed) .. "|" .. axis .. "|" .. tostring(key)
     local r    = md5Prefix32(raw) % total
@@ -93,7 +132,7 @@ local function resolveStyle(road)
         local names, weights = {}, {}
         for _, nm in ipairs(orderedStyleNames("curb")) do
             local st = styleCfg.curb.styles[nm]
-            if type(st) == "table" and st.sequence == nil then
+            if st.sequence == nil then
                 names[#names + 1] = nm
                 weights[nm] = st.weight or 0
             end
@@ -106,7 +145,7 @@ local function resolveStyle(road)
         local names, weights = {}, {}
         for _, nm in ipairs(orderedStyleNames("walk")) do
             local st = styleCfg.walk.styles[nm]
-            if type(st) == "table" and st.material then
+            if st.material then
                 names[#names + 1] = nm
                 weights[nm] = st.weight or 0
             end
@@ -117,28 +156,55 @@ local function resolveStyle(road)
     return curb, walk
 end
 
-local function curbMaterialName()
-    if mrState.curbMat then return mrState.curbMat end
-    return styleCfg and styleCfg.curb and styleCfg.curb.material or nil
-end
+local rawStyles = {map = {}, n = 0}
 
 function mr.rawStyle(key)
-    if type(key) == "string" and key:sub(1, 1) == "@" then
-        return {material = key:sub(2), scale = S.buildingArchitect.tile}
+    if type(key) ~= "string" then return nil end
+    local hit = rawStyles.map[key]
+    if hit == nil then
+        hit = Texture.raw(key, S.buildingArchitect.tile) or false
+        if hit and mr.batMat then
+            local mat = mr.batMat(hit.material)
+            if not mat then hit = false else hit.material = mat end
+        end
+        if rawStyles.n >= 512 then rawStyles.map, rawStyles.n = {}, 0 end
+        rawStyles.map[key], rawStyles.n = hit, rawStyles.n + 1
+    end
+    return hit or nil
+end
+
+function mr.styleFor(key, axis)
+    if not key then return nil end
+    local raw = mr.rawStyle(key)
+    if raw then return raw end
+    local own = styleCfg and styleCfg[axis] and styleCfg[axis].styles
+    if own and own[key] then return own[key] end
+    for _, ax in ipairs(Texture.kinds) do
+        local styles = styleCfg and styleCfg[ax] and styleCfg[ax].styles
+        local st     = styles and styles[key]
+        if ax ~= axis and st and st.material then return st end
     end
     return nil
 end
 
+local function curbStyle()
+    return mr.styleFor(curbKey, "curb")
+end
+
+local function curbMaterialName()
+    if mrState.curbMat then return mrState.curbMat end
+    local st = curbStyle()
+    if st and st.material then return st.material end
+    return styleCfg and styleCfg.curb and styleCfg.curb.material or nil
+end
+
 function mr.wallMaterialFor(key)
-    local raw = mr.rawStyle(key)
-    if raw then return raw.material end
-    local styles = styleCfg and styleCfg.wall and styleCfg.wall.styles
-    local st     = styles and key and styles[key]
-    if type(st) == "table" and st.material then return st.material end
+    local st = mr.styleFor(key, "wall")
+    if st and st.material then return st.material end
     return nil
 end
 
-function mr.meshroadCurbMaterial(road)
+function mr.meshCurb(road)
     local tagged = mr.wallMaterialFor(road and road.wall)
     if tagged then return tagged end
     local curb = styleCfg and styleCfg.curb
@@ -146,11 +212,10 @@ function mr.meshroadCurbMaterial(road)
 end
 
 local function heaviestStyle(axis)
-    local styles = styleCfg and styleCfg[axis] and styleCfg[axis].styles
-    if type(styles) ~= "table" then return nil end
+    local styles      = styleCfg and styleCfg[axis] and styleCfg[axis].styles
     local best, bestW = nil, -1
-    for k, st in pairs(styles) do
-        if type(st) == "table" and st.sequence == nil then
+    for k, st in pairs(styles or {}) do
+        if st.sequence == nil then
             local w = st.weight or 0
             if w > bestW or (w == bestW and best and k < best) then
                 best, bestW = k, w
@@ -161,14 +226,12 @@ local function heaviestStyle(axis)
 end
 
 function mr.walkStyle()
-    local raw = mr.rawStyle(walkKey)
-    if raw then return raw end
+    local st = mr.styleFor(walkKey, "walk")
+    if st and st.material then return st end
     local styles = styleCfg and styleCfg.walk and styleCfg.walk.styles
-    local st     = styles and walkKey and styles[walkKey]
-    if type(st) == "table" and st.material then return st end
-    local fb   = heaviestStyle("walk")
-    local fbSt = fb and styles and styles[fb]
-    if type(fbSt) == "table" and fbSt.material then return fbSt end
+    local fb     = heaviestStyle("walk")
+    local fbSt   = fb and styles and styles[fb]
+    if fbSt and fbSt.material then return fbSt end
     return nil
 end
 
@@ -180,22 +243,14 @@ end
 local function matScale(name)
     local def = styleCfg and styleCfg.defaultScale or 2.5
     local m   = name and styleCfg and styleCfg.materials and styleCfg.materials[name]
-    local sc  = type(m) == "table" and m.scale or nil
-    if type(sc) == "table" then
-        return sc[1] or def, sc[2] or sc[1] or def
-    elseif type(sc) == "number" then
-        return sc, sc
-    end
+    local sc  = m and m.scale
+    if sc then return sc[1], sc[2] end
     return def, def
 end
 
 function mr.styleScale(st, matName)
-    local sc = type(st) == "table" and st.scale or nil
-    if type(sc) == "table" and sc[1] then
-        return sc[1], sc[2] or sc[1]
-    elseif type(sc) == "number" then
-        return sc, sc
-    end
+    local sc = st and st.scale
+    if sc then return sc[1], sc[2] end
     return matScale(matName)
 end
 
@@ -207,9 +262,7 @@ function mr.curbScale()
     if mrState.curbMat then
         return mr.styleScale(mrState.wallStyle, mrState.curbMat)
     end
-    local styles = styleCfg and styleCfg.curb and styleCfg.curb.styles
-    local st     = styles and curbKey and styles[curbKey]
-    return mr.styleScale(st, curbMaterialName())
+    return mr.styleScale(curbStyle(), curbMaterialName())
 end
 
 local function curbBottomUV(uvx, sVal)
@@ -220,21 +273,19 @@ end
 local function curbAtlas()
     local name = curbMaterialName()
     local m    = name and styleCfg and styleCfg.materials and styleCfg.materials[name]
-    local key  = type(m) == "table" and m.atlas or nil
+    local key  = m and m.atlas
     if not key then return nil end
-    local reg = styleCfg.atlases
-    if type(reg) == "table" and type(reg[key]) == "table" then return reg[key] end
-    return S.defaultAtlas
+    return (styleCfg.atlases or {})[key] or S.defaultAtlas
 end
 
 local function curbBand()
     if mrState.curbBand0 then return 0 end
     local styles = styleCfg and styleCfg.curb and styleCfg.curb.styles
     local st     = styles and curbKey and styles[curbKey]
-    if type(st) == "table" and type(st.band) == "number" then return st.band end
+    if st and st.band then return st.band end
     local fb   = heaviestStyle("curb")
     local fbSt = fb and styles and styles[fb]
-    if type(fbSt) == "table" and type(fbSt.band) == "number" then return fbSt.band end
+    if fbSt and fbSt.band then return fbSt.band end
     return 0
 end
 
@@ -261,9 +312,9 @@ local function curbTopV(w)
     local atlas = curbAtlas()
     if not atlas then
         local _, sv = mr.curbScale()
-        return (w - S.curbStrip) / sv + 0.5
+        return (w - curb.strip) / sv + 0.5
     end
-    local k = (S.curbStrip > 1e-9) and (w / S.curbStrip) or 0.0
+    local k = (curb.strip > 1e-9) and (w / curb.strip) or 0.0
     if atlas.paintOn == "top" then
         return curbBandV(atlas, rowSpan(atlas.paintRows, k))
     end
@@ -274,9 +325,9 @@ local function curbFaceV(depth)
     local atlas = curbAtlas()
     if not atlas then
         local _, sv = mr.curbScale()
-        return depth / sv + 0.5
+        return (depth + mrState.vBase) / sv + 0.5
     end
-    local k = (S.height > 1e-9) and (depth / S.height) or 0.0
+    local k = (curb.height > 1e-9) and (depth / curb.height) or 0.0
     if atlas.paintOn == "top" then
         return curbBandV(atlas, rowSpan(atlas.plainRows, k))
     end
@@ -307,6 +358,12 @@ local function crKnots(p0, p1, p2, p3)
     return t
 end
 
+local function knotLerp(a, b, ta, tb, u)
+    if tb - ta < 1e-12 then return b end
+    local f = (u - ta) / (tb - ta)
+    return a * (1.0 - f) + b * f
+end
+
 local function crPoint(p0, p1, p2, p3, t, kn)
     if not kn then
         local t2 = t * t
@@ -318,19 +375,12 @@ local function crPoint(p0, p1, p2, p3, t, kn)
     end
     local k0, k1, k2, k3 = kn[1], kn[2], kn[3], kn[4]
     local u              = k1 + (k2 - k1) * t
-
-    local function lerp(a, b, ta, tb)
-        if tb - ta < 1e-12 then return b end
-        local f = (u - ta) / (tb - ta)
-        return a * (1.0 - f) + b * f
-    end
-
-    local a1 = lerp(p0, p1, k0, k1)
-    local a2 = lerp(p1, p2, k1, k2)
-    local a3 = lerp(p2, p3, k2, k3)
-    local b1 = lerp(a1, a2, k0, k2)
-    local b2 = lerp(a2, a3, k1, k3)
-    return lerp(b1, b2, k1, k2)
+    local a1             = knotLerp(p0, p1, k0, k1, u)
+    local a2             = knotLerp(p1, p2, k1, k2, u)
+    local a3             = knotLerp(p2, p3, k2, k3, u)
+    local b1             = knotLerp(a1, a2, k0, k2, u)
+    local b2             = knotLerp(a2, a3, k1, k3, u)
+    return knotLerp(b1, b2, k1, k2, u)
 end
 
 local function segmentTValues(p0, p1, p2, p3, spacing, kn, maxTurnDeg)
@@ -392,7 +442,7 @@ local function smoothPath(points, spacing)
     return result
 end
 
-local function resampleSectionTangents(points, sec, spacing)
+local function resampleTangents(points, sec, spacing)
     if not sec or #sec ~= #points or #points < 3 or spacing <= 0 then return nil end
     local n      = #points
     local padded = {points[1] * 2.0 - points[2]}
@@ -439,7 +489,7 @@ function mr.depthHermite(d1, d2, m1, m2, span, f)
               + (3.0 * f2 - 2.0 * f3) * d2 + (f3 - f2) * span * m2
 end
 
-local function smoothPathWithWidths(points, widths, spacing, depths, maxTurnDeg, depthStep)
+local function smoothWidths(points, widths, spacing, depths, maxTurnDeg, depthStep)
     local n = #points
     if n < 3 or spacing <= 0 then
         local op, ow, od = {}, {}, (depths and {} or nil)
@@ -530,9 +580,129 @@ end
 -- =============================================================================
 
 local function terrainZ(x, y, fallback)
-    local ok, h = pcall(core_terrain.getTerrainHeight, vec3(x, y, 0))
-    if ok and type(h) == "number" then return h end
+    local h = core_terrain.getTerrainHeight(vec3(x, y, 0))
+    if h then return h end
     return fallback or 0.0
+end
+
+local surf = {on = false, cache = {}, off = {}}
+
+function mr.surfaceBegin()
+    if surf.on then return end
+    surf.on, surf.cache, surf.off = true, {}, {}
+    local function off(o)
+        o:disableCollision()
+        surf.off[#surf.off + 1] = o
+    end
+    local forest = core_forest.getForestObject()
+    if forest then off(forest) end
+    local prefixes = {mr.daePrefix}
+    for _, pre in ipairs(mr.legacyPrefixes or {}) do prefixes[#prefixes + 1] = pre end
+    for _, nm in ipairs(scenetree.findClassObjects("TSStatic") or {}) do
+        for _, pre in ipairs(prefixes) do
+            if nm:sub(1, #pre) == pre then
+                local o = scenetree.findObject(nm)
+                if o then off(o) end
+                break
+            end
+        end
+    end
+    for _, nm in ipairs(scenetree.findClassObjects("Prefab") or {}) do
+        local o    = nm:sub(1, #mr.daePrefix) == mr.daePrefix and scenetree.findObject(nm)
+        local file = o and tostring(o:getField("filename", 0) or "") or ""
+        local ok   = file ~= "" and (C.fileExists(file) or C.fileExists("/" .. file))
+        for _, id in ipairs(ok and o:getChildrenObjectIds() or {}) do
+            local c = scenetree.findObjectById(id)
+            if c then off(c) end
+        end
+    end
+end
+
+function mr.surfaceEnd()
+    if not surf.on then return end
+    for _, o in ipairs(surf.off) do o:enableCollision() end
+    surf.on, surf.cache, surf.off = false, {}, {}
+end
+
+local function surfaceHit(x, y, z)
+    local key = string.format("%.2f,%.2f,%.2f", x, y, z)
+    local hit = surf.cache[key]
+    if hit == nil then
+        local res = castRay(vec3(x, y, z + decal.surfUp), vec3(x, y, z - decal.surfDown), true, false)
+        hit       = (res and res.norm.z >= decal.surfMinNz) and res.pt.z or false
+        surf.cache[key] = hit
+    end
+    return hit
+end
+
+mr.surfaceHit = surfaceHit
+
+function mr.surfaceSection(pts, hint, ring)
+    local n, hit, w, total = #pts, {}, {}, 0.0
+    for i = 1, n do
+        local a = (i > 1) and pts[i - 1] or (ring and pts[n]) or pts[i]
+        local b = (i < n) and pts[i + 1] or (ring and pts[1]) or pts[i]
+        w[i]    = (math.sqrt((pts[i].x - a.x) ^ 2 + (pts[i].y - a.y) ^ 2) + math.sqrt((b.x - pts[i].x) ^ 2 + (b.y - pts[i].y) ^ 2)) / 2.0
+        total   = total + w[i]
+        hit[i]  = surfaceHit(pts[i].x, pts[i].y, pts[i].z or hint)
+    end
+    local function joined(i, j) return hit[i] and hit[j] and math.abs(hit[i] - hit[j]) <= decal.surfGap end
+    local start = 1
+    if ring then
+        start = nil
+        for i = 1, n do
+            local j = (i - 2) % n + 1
+            while not hit[j] and j ~= i do j = (j - 2) % n + 1 end
+            if hit[i] and not joined(j, i) then start = i break end
+        end
+        if not start then
+            if not hit[1] then return nil end
+            local out = {}
+            for i = 1, n do out[i] = hit[i] end
+            return out
+        end
+    end
+    local best, run = nil, nil
+    for k = 0, n - 1 do
+        local i = (start + k - 1) % n + 1
+        if hit[i] then
+            if run and joined(run.last, i) then
+                run.last, run.wt, run.sum = i, run.wt + w[i], run.sum + hit[i] * w[i]
+            else
+                run = {last = i, wt = w[i], sum = hit[i] * w[i], members = {}}
+            end
+            run.members[i] = true
+            local off = math.abs(run.sum / run.wt - hint)
+            if not best or run.wt > best.wt or (run.wt == best.wt and off < best.off) then best = run best.off = off end
+        end
+    end
+    if not best or best.wt * 2 < total then return nil end
+    local zs = {}
+    for i in pairs(best.members) do zs[i] = hit[i] end
+    local function step(i, d) return ring and ((i + d - 1) % n + 1) or (i + d) end
+    local function flat(a, b) return math.sqrt((pts[a].x - pts[b].x) ^ 2 + (pts[a].y - pts[b].y) ^ 2) end
+    local out = {}
+    for i = 1, n do
+        if zs[i] then
+            out[i] = zs[i]
+        else
+            local near, d = nil, math.huge
+            for j in pairs(zs) do
+                local dj = math.abs(j - i)
+                if ring then dj = math.min(dj, n - dj) end
+                if dj < d or (dj == d and j < near) then near, d = j, dj end
+            end
+            local dir  = (ring and (i - near) % n <= n / 2 or (not ring and i > near)) and -1 or 1
+            local back = step(near, dir)
+            out[i]     = zs[near]
+            if back >= 1 and back <= n and zs[back] and flat(near, back) > 1e-6 then
+                local slope = (zs[near] - zs[back]) / flat(near, back)
+                slope       = math.max(-decal.surfSlope, math.min(decal.surfSlope, slope))
+                out[i]      = zs[near] + slope * flat(i, near)
+            end
+        end
+    end
+    return out
 end
 
 function mr.computeTangents(points)
@@ -571,7 +741,7 @@ function mr.cumulativeDistances(points)
     return out
 end
 
-function mr.interpDepthRingTangents(points, tangents)
+function mr.ringTangents(points, tangents)
     if next(mr.depthRingKeys) == nil or #points ~= #tangents then return tangents end
     local n          = #points
     local added, any = {}, false
@@ -602,7 +772,7 @@ end
 function mr.tangents3d(points, closed)
     local out = {}
     for i = 1, #points do out[i] = mr.tangent3d(points, i, closed) end
-    return mr.interpDepthRingTangents(points, out)
+    return mr.ringTangents(points, out)
 end
 
 function mr.tangent3d(points, i, closed)
@@ -661,7 +831,7 @@ function mr.dedupe(points, widths, depths)
 end
 
 function mr.densify(points, widths, depths, spacing, maxTurnDeg)
-    local dn, dw = smoothPathWithWidths(points, widths, spacing, depths, maxTurnDeg)
+    local dn, dw = smoothWidths(points, widths, spacing, depths, maxTurnDeg)
     dn, dw       = mr.dedupe(dn, dw, nil)
     return dn, dw
 end
@@ -694,7 +864,7 @@ end
 
 function mr.sweptRatio(points, widths, depths, spacing, maxTurnDeg)
     if #points < 3 then return math.huge, nil end
-    local dense, dwid = smoothPathWithWidths(points, widths, spacing, depths, maxTurnDeg)
+    local dense, dwid = smoothWidths(points, widths, spacing, depths, maxTurnDeg)
     return mr.minRadiusRatio(dense, dwid)
 end
 
@@ -873,10 +1043,10 @@ function mr.stripMitreTail(points, widths, heights, mitres, frac)
     return np, nw, nh, n - #keep
 end
 
-function mr.sharpenUnroundableCorners(points, widths, depths, spacing, maxTurnDeg, ratio)
+function mr.sharpenCorners(points, widths, depths, spacing, maxTurnDeg, ratio, forced)
     local n     = #points
     local sharp = {}
-    for i = 1, n do sharp[i] = false end
+    for i = 1, n do sharp[i] = (forced and forced[i]) == true end
     if n < 3 then return points, widths, depths, 0, nil end
 
     local blocked = {}
@@ -892,7 +1062,7 @@ function mr.sharpenUnroundableCorners(points, widths, depths, spacing, maxTurnDe
 
     for _ = 1, n do
         local cp, cw, cd = mr.dupSharp(points, widths, depths, sharp)
-        local dn, dw     = smoothPathWithWidths(cp, cw, spacing, cd, maxTurnDeg)
+        local dn, dw     = smoothWidths(cp, cw, spacing, cd, maxTurnDeg)
         dn, dw           = mr.dedupe(dn, dw, nil)
 
         local anyFree = false
@@ -1121,7 +1291,12 @@ function mr.nonFoldingKeep(points, tangents, offsets, closed, forced, minFrac)
     local keep = {1}
     for i = 2, n do
         local j = keep[#keep]
-        if (forced and forced[i]) or mr.offsetAdvances(points, tangents, offsets, j, i, minFrac) then
+        if forced and forced[i] then
+            while #keep > 1 and not forced[keep[#keep]] and not mr.offsetAdvances(points, tangents, offsets, keep[#keep], i, nil) do
+                keep[#keep] = nil
+            end
+            keep[#keep + 1] = i
+        elseif mr.offsetAdvances(points, tangents, offsets, j, i, minFrac) then
             keep[#keep + 1] = i
         elseif i == n and not closed then
             if #keep > 1 and not (forced and forced[j]) then
@@ -1178,7 +1353,7 @@ function mr.edgeAdvance(points, tangents, i, j, off)
 end
 
 function mr.spanGeometry(points, tangents, widths, i, j)
-    local hw = math.max(0.0, math.min(widths[i], widths[j]) / 2.0 - S.curbStrip)
+    local hw = math.max(0.0, math.min(widths[i], widths[j]) / 2.0 - curb.strip)
     if hw <= 1e-6 then return 0.0, 0.0, 0.0, 0.0 end
     local a  = mr.edgeAdvance(points, tangents, i, j, -hw)
     local b  = mr.edgeAdvance(points, tangents, i, j, hw)
@@ -1228,15 +1403,15 @@ end
 
 local function sectionLayout(width, profile, insetOverride, capShrink, height, uvHw, walkFracs)
     local hw = width * 0.5
-    height   = height or S.height
+    height   = height or curb.height
     local inset
     if insetOverride == nil then
-        inset = math.max(0.0, hw - S.curbStrip)
+        inset = math.max(0.0, hw - curb.strip)
     else
         inset = math.max(0.0, math.min(insetOverride, hw))
     end
 
-    local prof    = S.curbProfiles[profile] or S.curbProfiles.walk
+    local prof    = profileOf(profile, "walk")
     local chamfer = math.min(prof.exposed, height)
     local slopeH  = math.min(math.tan(math.rad(prof.angle)) * chamfer,
                             math.max(0.0, (hw - inset) * 0.9))
@@ -1253,7 +1428,7 @@ local function sectionLayout(width, profile, insetOverride, capShrink, height, u
 
     local useUv   = uvHw ~= nil
     local uvh     = uvHw or hw
-    local uvInset = math.max(0.0, uvh - S.curbStrip)
+    local uvInset = math.max(0.0, uvh - curb.strip)
 
     local cols = {}
 
@@ -1310,7 +1485,7 @@ local function addRoundedEnds(points, tangents, dists, widths, closed,
         if hw <= 1e-6 then return {} end
         if roundEnd.maxWidth and w0 >= roundEnd.maxWidth then return {} end
 
-        local tip      = math.max(roundEnd.tipWidth, 2.0 * S.curbStrip + 0.01)
+        local tip      = math.max(curb.tip, 2.0 * curb.strip + 0.01)
         tip            = math.max(1e-4, math.min(tip, w0 * 0.9))
         local thetaMax = math.acos(clamp(tip / w0, -1.0, 1.0))
         local steps    = math.max(1, math.ceil(math.deg(thetaMax)
@@ -1318,8 +1493,8 @@ local function addRoundedEnds(points, tangents, dists, widths, closed,
 
         local aOut = hw * roundEnd.radiusScale
         local bOut = hw
-        local aIn  = aOut - S.curbStrip
-        local bIn  = bOut - S.curbStrip
+        local aIn  = aOut - curb.strip
+        local bIn  = bOut - curb.strip
 
         local thetas = {}
         for k = 1, steps do thetas[#thetas + 1] = thetaMax * k / steps end
@@ -1437,6 +1612,33 @@ local function pushUV(sm, u, v)
     return sm._nu - 1
 end
 
+function mr.tag(sm, st, su, sv)
+    if Texture.moved(st) then sm.tex = {st = st, su = su, sv = sv} end
+    return sm
+end
+
+function mr.tagWalk(sm)
+    local su, sv = mr.walkScale()
+    return mr.tag(sm, mr.walkStyle(), su, sv)
+end
+
+function mr.tagCurb(sm)
+    local st = mrState.curbMat and mrState.wallStyle or curbStyle()
+    if not mrState.curbMat and curbAtlas() then return sm end
+    local su, sv = mr.curbScale()
+    return mr.tag(sm, st, su, sv)
+end
+
+function mr.placeAll(list)
+    for _, sm in ipairs(list) do
+        if sm.tex then
+            Texture.apply(sm, sm.tex.su, sm.tex.sv, sm.tex.st, uvFlipV)
+            sm.tex = nil
+        end
+    end
+    return list
+end
+
 local function pushTri(sm, a, b, c, n, ua, ub, uc)
     local f = sm.faces
     f[#f + 1] = {v = a, n = n, u = ua}
@@ -1454,8 +1656,7 @@ local function windingNormal(vs)
     return n
 end
 
-
-local function emitFace(sm, vs, uvs, want, tag)
+local function emitFace(sm, vs, uvs, want)
     local m = #vs
     if m < 3 then return end
     local n = windingNormal(vs)
@@ -1481,15 +1682,15 @@ local function emitFace(sm, vs, uvs, want, tag)
     end
 end
 
-local function pushQuad(sm, pA1, pA2, pB2, pB1, uvA1, uvA2, uvB2, uvB1, want, tag)
+local function pushQuad(sm, pA1, pA2, pB2, pB1, uvA1, uvA2, uvB2, uvB1, want)
     if mrState.orient then
-        emitFace(sm, {pA1, pA2, pB2, pB1}, {uvA1, uvA2, uvB2, uvB1},
-                 want or vec3(0, 0, 1), tag)
+        emitFace(sm, {pA1, pA2, pB2, pB1}, {uvA1, uvA2, uvB2, uvB1}, want or vec3(0, 0, 1))
         return
     end
     local e1 = pA2 - pA1
     local e2 = pB1 - pA1
     local n  = e1:cross(e2)
+    if n:length() < 1e-9 then n = (pB2 - pA1):cross(e2) end
     if n:length() < 1e-9 then return end
     n = n:normalized()
     if n.z < 0 then n = n * -1 end
@@ -1504,6 +1705,11 @@ local function pushQuad(sm, pA1, pA2, pB2, pB1, uvA1, uvA2, uvB2, uvB1, want, ta
     local t3   = pushUV(sm, uvB2[1], uvB2[2])
     local t4   = pushUV(sm, uvB1[1], uvB1[2])
 
+    if windingNormal({pA1, pA2, pB2, pB1}):dot(n) * S.faceSign < 0 then
+        pushTri(sm, i1, i3, i2, nIdx, t1, t3, t2)
+        pushTri(sm, i1, i4, i3, nIdx, t1, t4, t3)
+        return
+    end
     pushTri(sm, i1, i2, i3, nIdx, t1, t2, t3)
     pushTri(sm, i1, i3, i4, nIdx, t1, t3, t4)
 end
@@ -1516,6 +1722,7 @@ local function pushWall(sm, pA1, pA2, pB2, pB1, uvA1, uvA2, uvB2, uvB1, outward)
     local e1 = pA2 - pA1
     local e2 = pB1 - pA1
     local n  = e1:cross(e2)
+    if n:length() < 1e-9 then n = (pB2 - pA1):cross(e2) end
     if n:length() < 1e-9 then return end
     n = n:normalized()
     if outward and n:dot(outward) < 0 then n = n * -1 end
@@ -1530,6 +1737,11 @@ local function pushWall(sm, pA1, pA2, pB2, pB1, uvA1, uvA2, uvB2, uvB1, outward)
     local t3   = pushUV(sm, uvB2[1], uvB2[2])
     local t4   = pushUV(sm, uvB1[1], uvB1[2])
 
+    if windingNormal({pA1, pA2, pB2, pB1}):dot(n) * S.faceSign < 0 then
+        pushTri(sm, i1, i3, i2, nIdx, t1, t3, t2)
+        pushTri(sm, i1, i4, i3, nIdx, t1, t4, t3)
+        return
+    end
     pushTri(sm, i1, i2, i3, nIdx, t1, t2, t3)
     pushTri(sm, i1, i3, i4, nIdx, t1, t3, t4)
 end
@@ -1628,18 +1840,18 @@ mr.endFrameMinBody = 0.10
 
 function mr.endFrameSlope(width, height, profile)
     local hw      = width * 0.5
-    local strip   = hw - math.max(0.0, hw - S.curbStrip)
-    local prof    = S.curbProfiles[profile] or S.curbProfiles.walk
+    local strip   = hw - math.max(0.0, hw - curb.strip)
+    local prof    = profileOf(profile, "walk")
     local chamfer = math.min(prof.exposed, height)
     local slopeH  = math.min(math.tan(math.rad(prof.angle)) * chamfer, math.max(0.0, strip * 0.9))
-    if slopeH <= 1e-6 or chamfer <= 1e-6 or slopeH >= S.curbStrip - 1e-3 then return 0.0 end
+    if slopeH <= 1e-6 or chamfer <= 1e-6 or slopeH >= curb.strip - 1e-3 then return 0.0 end
     return slopeH
 end
 
 function mr.endFrameRings(path, pathW, pathH, tangents, dists, profile)
     local n = #path
     if n < 2 then return nil end
-    if dists[n] - dists[1] < 2.0 * S.curbStrip + mr.endFrameMinBody then return nil end
+    if dists[n] - dists[1] < 2.0 * curb.strip + mr.endFrameMinBody then return nil end
 
     local function sample(d)
         local j = 1
@@ -1657,16 +1869,16 @@ function mr.endFrameRings(path, pathW, pathH, tangents, dists, profile)
 
     local sh0 = mr.endFrameSlope(pathW[1], pathH[1], profile)
     local sh1 = mr.endFrameSlope(pathW[n], pathH[n], profile)
-    local lo  = dists[1] + S.curbStrip + 1e-4
-    local hi  = dists[n] - S.curbStrip - 1e-4
+    local lo  = dists[1] + curb.strip + 1e-4
+    local hi  = dists[n] - curb.strip - 1e-4
 
     local rows = {row(1)}
     if sh0 > 0.0 then rows[#rows + 1] = sample(dists[1] + sh0) end
-    rows[#rows + 1] = sample(dists[1] + S.curbStrip)
+    rows[#rows + 1] = sample(dists[1] + curb.strip)
     for i = 2, n - 1 do
         if dists[i] > lo and dists[i] < hi then rows[#rows + 1] = row(i) end
     end
-    rows[#rows + 1] = sample(dists[n] - S.curbStrip)
+    rows[#rows + 1] = sample(dists[n] - curb.strip)
     if sh1 > 0.0 then rows[#rows + 1] = sample(dists[n] - sh1) end
     rows[#rows + 1] = row(n)
 
@@ -1698,7 +1910,7 @@ function mr.prepareMeshRoad(spl)
     for i = 1, last do
         p[i] = raw[i]
         w[i] = rawW[i]
-        h[i] = rawH and rawH[i] or S.height
+        h[i] = rawH and rawH[i] or curb.height
     end
     if #p < 2 then return nil end
 
@@ -1731,7 +1943,15 @@ function mr.prepareMeshRoad(spl)
     local spacing = meshRoad.smoothCorners and meshRoad.segLen or 0.0
     local turn    = meshRoad.maxTurnDeg
 
-    if meshRoad.minRadiusMargin > 0 and not closed then
+    local forced = nil
+    if spl.joints then
+        forced = {}
+        for i in pairs(spl.joints) do
+            if i > 1 and i < #p then forced[i] = true end
+        end
+    end
+
+    if meshRoad.minRadiusMargin > 0 and not closed and not forced then
         local disp, iters, ratio, at
         p, w, h, disp, iters, ratio, at = mr.relaxForSweptPath(p, w, h, spacing, turn)
         note.relaxDisp, note.relaxIters = disp, iters
@@ -1741,12 +1961,12 @@ function mr.prepareMeshRoad(spl)
     if meshRoad.smoothCorners then
         if meshRoad.sharpCorners then
             local nSharp, runaway, mitres
-            p, w, h, nSharp, runaway, mitres = mr.sharpenUnroundableCorners(
-                p, w, h, meshRoad.segLen, turn, meshRoad.sharpRatio)
+            p, w, h, nSharp, runaway, mitres = mr.sharpenCorners(
+                p, w, h, meshRoad.segLen, turn, meshRoad.sharpRatio, forced)
             note.sharp, note.sharpRunaway = nSharp, runaway
             mrState.mitres                = mitres
         end
-        p, w, h = smoothPathWithWidths(p, w, meshRoad.segLen, h, turn,
+        p, w, h = smoothWidths(p, w, meshRoad.segLen, h, turn,
                                        meshRoad.depthStep)
         p, w, h = mr.dedupe(p, w, h)
         if meshRoad.miterStrip and mrState.mitres then
@@ -1766,8 +1986,20 @@ function mr.prepareMeshRoad(spl)
         note.narrowed = narrowed
     end
 
-    local tangents = mr.interpDepthRingTangents(p, mr.computeTangents(p))
+    local tangents = mr.ringTangents(p, mr.computeTangents(p))
     local dists    = mr.cumulativeDistances(p)
+    if closed and #p >= 3 then
+        local n = #p
+        for _, i in ipairs({1, n}) do
+            local a, b = p[(i == 1) and n or (i - 1)], p[(i == n) and 1 or (i + 1)]
+            local d1   = vec3(p[i].x - a.x, p[i].y - a.y, 0)
+            local d2   = vec3(b.x - p[i].x, b.y - p[i].y, 0)
+            if d1:length() > 1e-9 and d2:length() > 1e-9 then
+                local t = d1:normalized() + d2:normalized()
+                if t:length() > 1e-9 then tangents[i] = t:normalized() end
+            end
+        end
+    end
 
     if meshRoad.foldGuard and #p > 2 then
         local offsets = {}
@@ -1789,6 +2021,12 @@ function mr.prepareMeshRoad(spl)
                 if best then forced[best] = true end
             end
         end
+        if forced then
+            local scale = mr.miterScales(p, tangents, closed, nil)
+            for i = 1, #p do
+                if forced[i] then offsets[i] = offsets[i] * scale[i] end
+            end
+        end
         local keep = mr.nonFoldingKeep(p, tangents, offsets, closed, forced,
                                     meshRoad.minEdgeAdvanceFrac)
         if #keep > 2 and #keep < #p then
@@ -1808,15 +2046,58 @@ end
 -- BUILD
 -- =============================================================================
 
+function mr.openRing(path, w, h, tan)
+    local n        = #path
+    local best, at = -1.0, 1
+    for k = 1, n do
+        local a, b = path[k], path[(k % n) + 1]
+        local d    = math.sqrt((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2)
+        if d > best then best, at = d, k end
+    end
+    local j              = (at % n) + 1
+    local mid            = (path[at] + path[j]) * 0.5
+    local dir            = vec3(path[j].x - path[at].x, path[j].y - path[at].y, 0)
+    dir                  = (dir:length() > 1e-9) and dir:normalized() or tan[at]
+    local mw, mh         = (w[at] + w[j]) / 2.0, (h[at] + h[j]) / 2.0
+    local p2, w2, h2, t2 = {mid}, {mw}, {mh}, {dir}
+    for k = 1, n do
+        local i     = ((at + k - 1) % n) + 1
+        p2[#p2 + 1] = path[i]
+        w2[#w2 + 1] = w[i]
+        h2[#h2 + 1] = h[i]
+        t2[#t2 + 1] = tan[i]
+    end
+    p2[#p2 + 1], w2[#w2 + 1], h2[#h2 + 1], t2[#t2 + 1] = mid, mw, mh, dir
+    local skip = mr.cumulativeDistances(path)[at] + best / 2.0
+    return p2, w2, h2, t2, skip
+end
+
+local function hasFeature(spl)
+    for _, f in ipairs(features) do
+        if spl[f.key] == true then return true end
+    end
+    return false
+end
+
+local function tileOf(v)
+    local st  = mr.styleFor(v, "roof")
+    local mat = st and st.material
+    if not mat then return nil end
+    local su, sv = mr.styleScale(st, mat)
+    return mat, su, sv, st
+end
+
 local function buildRoadMesh(spl)
     mr.lastBuild  = nil
     local pts, ws = spl.points, spl.widths
     if #pts < 2 then return nil end
+    mrState.vBase = (spl.building and spl.home) and (spl.home.z - pts[1].z) or 0.0
 
     local isMesh = (spl.source == "meshroad")
     local path, pathW, pathH, tangents, dists, isClosed, caps, note
 
     local framed  = false
+    local seam    = false
     local gateAt  = nil
     local winPlan = nil
     if isMesh then
@@ -1826,7 +2107,18 @@ local function buildRoadMesh(spl)
         path, pathW, pathH, tangents, dists, isClosed, note = mr.prepareMeshRoad(spl)
         spl.depths                                          = rawDepths
         if not path or #path < 2 then return nil end
-        if spl.ends == true and not isClosed then
+        if isClosed and (gates or spl.windows or hasFeature(spl)) then
+            local skip
+            path, pathW, pathH, tangents, skip = mr.openRing(path, pathW, pathH, tangents)
+            dists                              = mr.cumulativeDistances(path)
+            local total                        = dists[#dists]
+            if mrState.up then
+                local up   = mrState.up
+                mrState.up = function(d) return up((d + skip) % total) end
+            end
+            isClosed, seam = false, true
+        end
+        if spl.ends == true and not isClosed and not seam then
             local fp, fw, fh, ft, fd = mr.endFrameRings(path, pathW, pathH, tangents, dists,
                                                         spl.profile or "walk")
             if fp then
@@ -1841,14 +2133,30 @@ local function buildRoadMesh(spl)
             if gateAt then dists = mr.cumulativeDistances(path) end
         end
         if spl.windows and not isClosed then
-            path, pathW, pathH, tangents, gateAt, winPlan = Window.plan(spl.windows, path, pathW, pathH, tangents, gateAt)
+            local cfg = spl.windows
+            local w = spl.walls
+            if spl.covered and (spl.covered.right or spl.covered.left or spl.covered.start or spl.covered["end"] or #w.right > 0 or #w.left > 0
+                                or #w.start > 0 or #w["end"] > 0) then
+                cfg       = {}
+                for k, v in pairs(spl.windows) do cfg[k] = v end
+                cfg.faces = {}
+                for k, v in pairs(spl.windows.faces) do cfg.faces[k] = v and not spl.covered[k] end
+                cfg.skip  = w
+            end
+            if seam then
+                local was = cfg
+                cfg       = {}
+                for k, v in pairs(was) do cfg[k] = v end
+                cfg.faces = {right = was.faces.right, left = was.faces.left}
+            end
+            path, pathW, pathH, tangents, gateAt, winPlan = Window.plan(cfg, path, pathW, pathH, tangents, gateAt)
             dists                                         = mr.cumulativeDistances(path)
         end
         caps = {}
         for i = 1, #path do caps[i] = false end
     else
         mrState.up, mrState.turnScale = nil, 1.0
-        local sp, spW                 = smoothPathWithWidths(pts, ws, smoothing.segLen)
+        local sp, spW                 = smoothWidths(pts, ws, smoothing.segLen)
         path, pathW                   = sp, spW
         if #path < 2 then return nil end
 
@@ -1861,7 +2169,7 @@ local function buildRoadMesh(spl)
         local np   = #path
         local secT = nil
         if spl.sectionTangents then
-            secT = resampleSectionTangents(pts, spl.sectionTangents, smoothing.segLen)
+            secT = resampleTangents(pts, spl.sectionTangents, smoothing.segLen)
             if secT and #secT ~= np then secT = nil end
         end
 
@@ -1911,7 +2219,7 @@ local function buildRoadMesh(spl)
             for i = 1, np do caps[i] = false end
         end
         pathH = {}
-        for i = 1, #path do pathH[i] = S.height end
+        for i = 1, #path do pathH[i] = curb.height end
     end
 
     local np = #path
@@ -1926,6 +2234,7 @@ local function buildRoadMesh(spl)
 
     local prof        = spl.profile or "walk"
     local overObjects = spl.overObjects and true or false
+    local overSurface = spl.overSurface and true or false
     local keepBottom  = isMesh and (spl.bottom == true)
     local uvRef       = (isMesh or meshRoad.uvxFromMedianDecal) and uvHw or nil
 
@@ -1969,6 +2278,8 @@ local function buildRoadMesh(spl)
 
     local smWalk = newSubmesh(walkMat or curbMat)
     local smCurb = newSubmesh(curbMat)
+    mr.tagWalk(smWalk)
+    mr.tagCurb(smCurb)
 
     local stations = {}
     local tan3s    = nil
@@ -2007,6 +2318,34 @@ local function buildRoadMesh(spl)
 
         local top, bot = {}, {}
         local endDrop  = (framed and (i == 1 or i == np)) and chamfer or 0.0
+        local surfZ    = nil
+        if overSurface and not isMesh then
+            local xs = {}
+            for k = 1, nc do xs[#xs + 1] = cols[k].x end
+            local a, b = cols[1].x, cols[nc].x
+            if a > b then a, b = b, a end
+            for k = 1, math.floor((b - a) / decal.surfStep) do xs[#xs + 1] = a + k * decal.surfStep end
+            table.sort(xs)
+            local qs = {}
+            for _, x in ipairs(xs) do
+                if #qs == 0 or x - qs[#qs] > 1e-6 then qs[#qs + 1] = x end
+            end
+            xs, qs = qs, {}
+            for j, x in ipairs(xs) do
+                qs[j] = p + side * x
+            end
+            local zs = mr.surfaceSection(qs, p.z, false)
+            if zs then
+                surfZ = {}
+                for k = 1, nc do
+                    local best, d = nil, math.huge
+                    for j, x in ipairs(xs) do
+                        if math.abs(x - cols[k].x) < d then best, d = j, math.abs(x - cols[k].x) end
+                    end
+                    surfZ[k] = zs[best]
+                end
+            end
+        end
         for k = 1, nc do
             if isMesh then
                 local q    = p + side * cols[k].x
@@ -2017,7 +2356,7 @@ local function buildRoadMesh(spl)
                 end
             else
                 local q      = p + side * cols[k].x
-                local ground = overObjects and p.z or terrainZ(q.x, q.y, p.z)
+                local ground = (surfZ and surfZ[k]) or (overObjects and p.z) or terrainZ(q.x, q.y, p.z)
                 local base   = ground + S.zOffset + decal.lift
                 top[k]       = vec3(q.x, q.y, base - cols[k].drop)
                 if cols[k].bottom then bot[k] = vec3(q.x, q.y, base - hgt) end
@@ -2030,14 +2369,16 @@ local function buildRoadMesh(spl)
                        gate = gateAt and gateAt[i] or nil}
     end
 
-    mr.lastBuild = {stations = stations, closed = isClosed, isMesh = isMesh}
+    mr.lastBuild = {stations = stations, closed = isClosed, isMesh = isMesh, seam = seam}
 
     local segCount = isClosed and np or (np - 1)
     local wrapS    = isClosed
                             and (stations[np].s + (path[1] - path[np]):length()) or 0.0
-    local zoneLo  = dists[1] + S.curbStrip + 1e-4
-    local zoneHi  = dists[np] - S.curbStrip - 1e-4
-    local topSegs = (isMesh and spl.noTop) and 0 or segCount
+    local zoneLo  = dists[1] + curb.strip + 1e-4
+    local zoneHi  = dists[np] - curb.strip - 1e-4
+    local role    = {ground = spl.ground ~= false, roof = spl.roof ~= false}
+    local roofM   = winPlan and Window.roofOf(winPlan.cfg, role)
+    local topSegs = (isMesh and (spl.noTop or (roofM and not roofM.part))) and 0 or segCount
 
     for i = 1, topSegs do
         local A, B       = stations[i], stations[(i % np) + 1]
@@ -2063,8 +2404,8 @@ local function buildRoadMesh(spl)
                     uvA1, uvA2 = {curbU(ua), curbFaceV(da)}, {curbU(ub), curbFaceV(da)}
                     uvB2, uvB1 = {curbU(ub2), curbFaceV(db)}, {curbU(ua2), curbFaceV(db)}
                 else
-                    local wa   = S.curbStrip - math.max(0.0, math.min(sA - dists[1], dists[np] - sA))
-                    local wb   = S.curbStrip - math.max(0.0, math.min(sB - dists[1], dists[np] - sB))
+                    local wa   = curb.strip - math.max(0.0, math.min(sA - dists[1], dists[np] - sA))
+                    local wb   = curb.strip - math.max(0.0, math.min(sB - dists[1], dists[np] - sB))
                     uvA1, uvA2 = {curbU(ua), curbTopV(wa)}, {curbU(ub), curbTopV(wa)}
                     uvB2, uvB1 = {curbU(ub2), curbTopV(wb)}, {curbU(ua2), curbTopV(wb)}
                 end
@@ -2083,10 +2424,10 @@ local function buildRoadMesh(spl)
             else
                 local ua, ub     = A.cols[c].uvx, A.cols[c + 1].uvx
                 local ua2c, ub2c = B.cols[c].uvx, B.cols[c + 1].uvx
-                local wa         = S.curbStrip - (uvHw - math.abs(ua))
-                local wb         = S.curbStrip - (uvHw - math.abs(ub))
-                local wa2        = S.curbStrip - (uvHw - math.abs(ua2c))
-                local wb2        = S.curbStrip - (uvHw - math.abs(ub2c))
+                local wa         = curb.strip - (uvHw - math.abs(ua))
+                local wb         = curb.strip - (uvHw - math.abs(ub))
+                local wa2        = curb.strip - (uvHw - math.abs(ua2c))
+                local wb2        = curb.strip - (uvHw - math.abs(ub2c))
                 uvA1             = {curbU(sA), curbTopV(wa)}
                 uvA2             = {curbU(sA), curbTopV(wb)}
                 uvB2             = {curbU(sB), curbTopV(wb2)}
@@ -2112,33 +2453,31 @@ local function buildRoadMesh(spl)
                 local vq = {A.top[c], A.top[c + 1], B.top[c + 1], B.top[c]}
                 local uq = {uvA1, uvA2, uvB2, uvB1}
                 for _, t in ipairs(mr.frameTris(e)) do
-                    emitFace(sm, {vq[t[1]], vq[t[2]], vq[t[3]]}, {uq[t[1]], uq[t[2]], uq[t[3]]},
-                             want, kind)
+                    emitFace(sm, {vq[t[1]], vq[t[2]], vq[t[3]]}, {uq[t[1]], uq[t[2]], uq[t[3]]}, want)
                 end
             else
                 pushQuad(sm, A.top[c], A.top[c + 1], B.top[c + 1], B.top[c],
-                         uvA1, uvA2, uvB2, uvB1, want, kind)
+                         uvA1, uvA2, uvB2, uvB1, want)
             end
         end
     end
 
     local winSubs = {}
-    local winCtx  = winPlan and {nc = nc, np = np, gateAt = gateAt, tangents = tangents, emitFace = emitFace,
+    local winCtx  = winPlan and {nc = nc, np = np, gateAt = gateAt, tangents = tangents, emitFace = emitFace, seam = seam,
                                  uv = {curbU = curbU, curbFaceV = curbFaceV, capCurbUV = mr.capCurbUV}}
     if winCtx then
         local function styleOf(key)
-            local raw = mr.rawStyle(key)
-            if raw then return raw end
-            local styles = styleCfg and styleCfg.wall and styleCfg.wall.styles
-            local st     = styles and key and styles[key]
-            if type(st) == "table" and st.material then return st end
+            local st = mr.styleFor(key, "wall")
+            if st and st.material then return st end
             return nil
         end
+        local curbSig = Texture.sig(smCurb.tex and smCurb.tex.st)
         winCtx.smFor = function(key)
             local st = styleOf(key)
-            if not st or st.material == smCurb.material then return smCurb end
-            if not winSubs[st.material] then winSubs[st.material] = newSubmesh(st.material) end
-            return winSubs[st.material]
+            if not st or (st.material == smCurb.material and Texture.sig(st) == curbSig) then return smCurb end
+            local k = st.material .. Texture.sig(st)
+            if not winSubs[k] then winSubs[k] = mr.tag(newSubmesh(st.material), st, mr.styleScale(st, st.material)) end
+            return winSubs[k]
         end
         winCtx.withStyle = function(key, fn)
             local st = styleOf(key)
@@ -2151,8 +2490,9 @@ local function buildRoadMesh(spl)
         end
     end
     local winTaken = winCtx and Window.sides(winPlan, stations, winCtx) or nil
-    local winEnds  = winCtx and {[1] = Window.endFace(winPlan, stations, winCtx, 1, -1),
+    local winEnds  = winCtx and not seam and {[1] = Window.endFace(winPlan, stations, winCtx, 1, -1),
                                  [np] = Window.endFace(winPlan, stations, winCtx, np, 1)} or {}
+    if winPlan then Window.report(spl.srcIds or {spl.id}, winPlan, Window.encode(spl.windows)) end
 
     local function at(st, c, depth)
         if not depth then return st.bot[c] end
@@ -2306,7 +2646,7 @@ local function buildRoadMesh(spl)
         end
     end
 
-    if isMesh and meshRoad.endCaps and not isClosed then
+    if isMesh and meshRoad.endCaps and not isClosed and not seam then
         local roleIdx = {}
         for k = 1, nc do
             if cols0[k].role then roleIdx[cols0[k].role] = k end
@@ -2412,6 +2752,22 @@ local function buildRoadMesh(spl)
         end
     end
 
+    if not isMesh and not isClosed then
+        for _, e in ipairs({{1, -1.0, spl.noCapStart}, {np, 1.0, spl.noCapEnd}}) do
+            local st = stations[e[1]]
+            if not e[3] and st.bot[1] and st.bot[nc] then
+                local function uvOf(ci, bottom)
+                    return mr.capCurbUV(st.cols[ci].uvx, 0.0, bottom and -st.height or -(st.cols[ci].drop or 0.0))
+                end
+                local ring = {}
+                for _, c in ipairs({{1, true}, {1, false}, {nc, false}, {nc, true}}) do
+                    ring[#ring + 1] = {v = c[2] and st.bot[c[1]] or st.top[c[1]], uv = uvOf(c[1], c[2]), bottom = c[2], ci = c[1]}
+                end
+                mr.pushCapRing(smCurb, st, ring, uvOf, tangents[e[1]] * e[2])
+            end
+        end
+    end
+
     if isMesh and not isClosed then
         for _, f in ipairs(features) do
             if spl[f.key] == true then
@@ -2420,6 +2776,46 @@ local function buildRoadMesh(spl)
         end
     end
 
+    local roofMat, roofTile = nil, nil
+    if roofM then
+        local st  = mr.styleFor(roofM.mat, "roof")
+        local mat = st and st.material
+        roofMat   = mat or smWalk.material
+        roofTile  = mat and {mr.styleScale(st, mat)} or {mr.walkScale()}
+        local tex = Window.modValue(roofM, "tex")
+        roofTile  = {roofTile[1] * tex, roofTile[2] * tex, roofM.turn, mat and st or mr.walkStyle()}
+        local grow, lift = Ornament.border(winPlan.cfg, role)
+        local gutter     = {}
+        for _, f in ipairs(Window.faceKeys) do gutter[f] = Window.modAt(winPlan.cfg, "gutter", f, role) or nil end
+        if next(gutter) == nil then gutter = nil end
+        Roof.build(roofM, stations, {nc = nc, np = np, tangents = tangents, emit = emitFace, curbU = curbU, curbFaceV = curbFaceV, grow = grow, lift = lift, cut = spl.cut,
+            gutter = gutter,
+            gutterSm = function()
+                local want   = winPlan.cfg.mods.gutter.mat
+                local gst    = want and mr.styleFor(want, "roof")
+                local gm     = gst and gst.material or smWalk.material
+                local gs     = (gst and gst.material) and gst or mr.walkStyle()
+                local su, sv = mr.styleScale(gs, gm)
+                local k      = "gutter|" .. tostring(gm) .. Texture.sig(gs)
+                if not winSubs[k] then
+                    winSubs[k]      = mr.tag(newSubmesh(gm), gs, su, sv)
+                    winSubs[k].kind = "gutter"
+                end
+                return winSubs[k], su, sv
+            end,
+            wallSm = function(face) return winCtx.smFor(face and winPlan.cfg.walls[face]) end,
+            roofSm = function()
+                local walkSig = Texture.sig(smWalk.tex and smWalk.tex.st)
+                if not mat or (mat == smWalk.material and Texture.sig(st) == walkSig) then
+                    local su, sv = mr.walkScale()
+                    return smWalk, su, sv
+                end
+                local su, sv = mr.styleScale(st, mat)
+                local k      = mat .. Texture.sig(st)
+                if not winSubs[k] then winSubs[k] = mr.tag(newSubmesh(mat), st, su * tex, sv * tex) end
+                return winSubs[k], su, sv
+            end})
+    end
 
     local out = {}
     if #smCurb.faces > 0 then out[#out + 1] = smCurb end
@@ -2430,16 +2826,30 @@ local function buildRoadMesh(spl)
     for _, mat in ipairs(mats) do
         if winSubs[mat] ~= smCurb and winSubs[mat] ~= smWalk and #winSubs[mat].faces > 0 then out[#out + 1] = winSubs[mat] end
     end
-    if winPlan and winPlan.cfg.modules then
+    if winPlan then
+        local ctx = {nc = nc, np = np, tangents = tangents, role = role, under = spl.under, base = spl.home and spl.home.z, roofMat = roofM and not roofM.part and roofMat or nil,
+                     roofTile = roofTile, tileOf = tileOf}
+        for _, pl in ipairs(winPlan.placed or {}) do pl.push, pl.front, pl.facing = nil, nil, nil end
+        local trims = Ornament.build(winPlan, stations, ctx)
         for _, pl in ipairs(winPlan.placed or {}) do
-            local m = pl.row.dae and Modules.model(pl.row.dae)
+            local on = Window.modAt(winPlan.cfg, pl.row.at and "doors" or "windows", pl.face)
+            local dae = pl.dae or pl.row.dae
+            local m   = on and dae and not pl.gone and Modules.model(dae)
             if m then
-                for _, sm in ipairs(Modules.place(m, pl.origin, pl.inward)) do out[#out + 1] = sm end
+                local inward = pl.facing and pl.facing * -1.0 or pl.inward
+                local spot   = pl.facing and (pl.front + inward * winPlan.sink[pl.face]) or (pl.origin + pl.inward * (winPlan.sink[pl.face] - (pl.push or 0.0)))
+                spot         = spot - vec3(0, 0, Modules.sill(dae))
+                for _, sm in ipairs(Modules.place(m, spot, inward)) do
+                    sm.kind, sm.slot, sm.fi = pl.row.at and "doors" or "windows", pl.slot, pl.fi
+                    sm.along, sm.out        = pl.along, inward * -1.0
+                    out[#out + 1]           = sm
+                end
             end
         end
+        for _, sm in ipairs(trims) do out[#out + 1] = sm end
     end
     if #out == 0 then return nil end
-    return out, nil, note
+    return mr.placeAll(out), nil, note
 end
 
 -- =============================================================================
@@ -2489,6 +2899,13 @@ M.featureOverrides = function(f, raw)
     end
     return any and out or nil
 end
+M.settings   = S
+M.curb       = curb
+M.curbLimits = curbLimits
+M.curbDimsOf = curbDimsOf
+M.setCurb    = setCurb
+M.profileOf  = profileOf
+
 M.featureDims = function(f, over)
     local out = {}
     if f.defaults then

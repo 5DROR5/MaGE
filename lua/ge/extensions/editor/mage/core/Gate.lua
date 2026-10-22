@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - MeshRoad gates
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -16,6 +16,8 @@ local minWidth     = 1.0
 local maxWidth     = 50.0
 local defaultTop   = 1.0
 local maxOffset    = 100.0
+local minRise      = 0.05
+local maxRise      = 50.0
 local minOpening   = 0.5
 local matchDist    = 0.5
 local arcTol       = 0.05
@@ -49,6 +51,7 @@ local function clean(g)
         dir   = (g.dir == "right") and "right" or "left",
         top   = math.max(0.0, math.min(maxOffset, tonumber(g.top) or defaultTop)),
         sill  = math.max(0.0, math.min(maxOffset, tonumber(g.sill) or 0.0)),
+        rise  = tonumber(g.rise) and math.max(minRise, math.min(maxRise, tonumber(g.rise))) or nil,
     }
 end
 
@@ -79,6 +82,7 @@ local function encode(list)
             dir   = (g.style == "quarter") and g.dir or nil,
             top   = (math.abs((g.top or defaultTop) - defaultTop) > 1e-6) and r(g.top * 1000 + 0.5) / 1000 or nil,
             sill  = ((g.sill or 0) > 1e-6) and r(g.sill * 1000 + 0.5) / 1000 or nil,
+            rise  = (g.rise and g.style ~= "rect") and r(g.rise * 1000 + 0.5) / 1000 or nil,
         }
     end
     return jsonEncode(out)
@@ -99,6 +103,13 @@ end
 -- SHAPE
 -- =============================================================================
 
+local function riseOf(g)
+    if g.style == "rect" then return 0.0 end
+    if g.style == "round" then return g.width / 2.0 end
+    if g.style == "pointed" then return g.width * math.sqrt(3.0) / 2.0 end
+    return math.min(g.width, g.apex - g.floor)
+end
+
 local function openingZ(g, d)
     local half = g.width / 2.0
     if d < -half - 1e-9 or d > half + 1e-9 then return nil end
@@ -115,9 +126,15 @@ local function openingZ(g, d)
         local cx   = (d <= 0) and half or -half
         z          = apex - rise + math.sqrt(math.max(0.0, R * R - (d - cx) ^ 2))
     else
-        local rv = math.min(g.width, apex - g.floor)
+        local rv = math.min(g.rise or g.width, apex - g.floor)
         local t  = (g.dir == "right") and ((half - d) / g.width) or ((d + half) / g.width)
         z        = apex - rv + rv * math.sqrt(math.max(0.0, 1.0 - t * t))
+        return z
+    end
+    if g.rise and g.style ~= "rect" then
+        local r0 = riseOf(g)
+        local r1 = math.min(g.rise, apex - g.floor)
+        if r0 > 1e-9 then z = apex - (apex - z) * r1 / r0 end
     end
     return z
 end
@@ -215,7 +232,7 @@ local function apply(resolved, spl, path, w, h, tan)
             local lower    = (g.sill > 1e-6) and (floor + g.sill) or nil
             if apex > (lower or floor) + 1e-3 then
                 spans[#spans + 1] = {g = g, c = c, a = a, b = b, apex = apex, lower = lower,
-                                     view = {style = g.style, width = g.width, dir = g.dir, apex = apex, floor = lower or floor}}
+                                     view = {style = g.style, width = g.width, dir = g.dir, apex = apex, floor = lower or floor, rise = g.rise}}
             end
         end
     end
@@ -285,7 +302,7 @@ local function apply(resolved, spl, path, w, h, tan)
     end
 
     local out = {}
-    for k, r in ipairs(rows) do
+    for _, r in ipairs(rows) do
         local prev = out[#out]
         if prev and prev.sp and r.sp == prev.sp and prev.info.open ~= r.info.open and r.at - prev.at > 4 * jambGap then
             local lo, hi = prev.at, r.at
@@ -319,6 +336,9 @@ M.maxOffset    = maxOffset
 M.parse        = parse
 M.encode       = encode
 M.nodeOf       = nodeOf
+M.minRise      = minRise
+M.maxRise      = maxRise
+M.riseOf       = riseOf
 M.openingZ     = openingZ
 M.resolve      = resolve
 M.apply        = apply

@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - Road Architect capture
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -68,8 +68,8 @@ local function terrainRay(orig)
         local hit    = orig(p, dir, len, ...)
         local isDown = (type(dir) == "cdata" or type(dir) == "table") and type(dir.z) == "number" and dir.z < -0.99
         if not isDown then return hit end
-        local ok, tz = pcall(core_terrain.getTerrainHeight, vec3(p.x, p.y, 0))
-        if not ok or type(tz) ~= "number" then return hit end
+        local tz = core_terrain.getTerrainHeight(vec3(p.x, p.y, 0))
+        if not tz then return hit end
         local down = p.z - tz
         if down < 0 or (type(len) == "number" and down > len) then return hit end
         if type(hit) == "number" and down - hit > snapMaxLift then return hit end
@@ -210,14 +210,7 @@ local function bake()
         local file      = levelPath .. mr.daeDir .. key .. ".dae"
         local xml, _, t = mr.buildDae({{road = {name = name}, meshes = meshes, keepNormals = true}}, origin)
         if (t or 0) > 0 and mr.writeChecked(file, xml) then
-            local pos = vec3(origin.x, origin.y, 0)
-            local obj = scenetree.findObject(key)
-            if obj then
-                obj:setField('shapeName', 0, file)
-                obj:setPosition(pos)
-            else
-                mr.placeStatic(file, key, pos)
-            end
+            mr.placeStatic(file, key, vec3(origin.x, origin.y, 0))
             for _, o in ipairs(objs) do o.hidden = true end
             written, tris = written + 1, tris + t
         else

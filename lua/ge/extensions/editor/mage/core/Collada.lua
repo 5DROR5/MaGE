@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - COLLADA reader
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -13,6 +13,7 @@ local M = {}
 local skipNames = {"^colmesh", "^collision", "^col[%-_]", "^los[%-_]", "^los$", "^bounds$", "^nulldetail"}
 local identity  = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
 local yUp       = {1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1}
+local plainTint = 0.98
 
 -- =============================================================================
 -- XML
@@ -180,6 +181,9 @@ local function primitives(mesh, src)
                     ins.pos  = {src = src[vs.POSITION], off = off}
                     if vs.NORMAL then ins.nrm = {src = src[vs.NORMAL], off = off} end
                     if vs.TEXCOORD then tex[#tex + 1] = {src = src[vs.TEXCOORD], off = off, set = -1} end
+                    if vs.COLOR then ins.col = {src = src[vs.COLOR], off = off} end
+                elseif sem == "COLOR" then
+                    ins.col = {src = src[id], off = off}
                 elseif sem == "NORMAL" then
                     ins.nrm = {src = src[id], off = off}
                 elseif sem == "TEXCOORD" then
@@ -239,6 +243,12 @@ local function emit(out, prim, m, nm, mirrored, material)
             local u, v       = fetch(ins.uv, poly.p, base)
             local u2, v2     = fetch(ins.uv2, poly.p, base)
             local nx, ny, nz = fetch(ins.nrm, poly.p, base)
+            local r, g, b    = fetch(ins.col, poly.p, base)
+            if r then
+                local cs = sm.csum or {0, 0, 0, 0}
+                cs[1], cs[2], cs[3], cs[4] = cs[1] + r, cs[2] + g, cs[3] + b, cs[4] + 1
+                sm.csum                    = cs
+            end
             corners[#corners + 1] = {p = point(m, x, y, z), n = nx and direction(nm, nx, ny, nz),
                                      uv = {u = u or 0, v = 1 - (v or 0)}, uv2 = sm.uvs2 and {u = u2 or 0, v = 1 - (v2 or 0)}}
         end
@@ -316,7 +326,7 @@ end
 
 local function sameMatrix(a, b)
     for i = 1, 16 do
-        if math.abs(a[i] - b[i]) > 1e-6 then return false end
+        if math.abs(a[i] - b[i]) > 1e-3 then return false end
     end
     return true
 end
@@ -409,6 +419,13 @@ local function read(text)
     end
     local meshes = {}
     for _, sm in ipairs(out) do
+        local cs = sm.csum
+        if cs and cs[4] > 0 then
+            local t = {}
+            for k = 1, 3 do t[k] = math.floor(math.max(0.0, math.min(1.0, cs[k] / cs[4])) * 255 + 0.5) / 255 end
+            if t[1] < plainTint or t[2] < plainTint or t[3] < plainTint then sm.tint = t end
+        end
+        sm.csum = nil
         if #sm.faces > 0 then meshes[#meshes + 1] = sm end
     end
     return meshes

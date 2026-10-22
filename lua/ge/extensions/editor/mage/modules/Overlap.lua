@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - MeshRoad overlap
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -93,7 +93,8 @@ local function plan(roads)
     local nb = {}
     for i = 1, #list do
         for j = i + 1, #list do
-            if boxesTouch(list[i].box, list[j].box) then
+            local same = list[i].road.building and list[i].road.building == list[j].road.building
+            if not same and boxesTouch(list[i].box, list[j].box) then
                 local a, b = list[i].road, list[j].road
                 nb[a]      = nb[a] or {}
                 nb[b]      = nb[b] or {}
@@ -458,8 +459,6 @@ local function removable(solid, cand, poly, winner, flat)
     return true
 end
 
-
-
 local function onBoundary(solid, cand, piece, flat)
     local cx, cy, cz = 0.0, 0.0, 0.0
     for _, p in ipairs(piece) do cx, cy, cz = cx + p.x, cy + p.y, cz + p.z end
@@ -734,7 +733,8 @@ local function clipSubmesh(sm, solid, winner)
         if g.result then changed = true end
     end
     if not changed then return sm end
-    local out = {verts = {}, faces = {}, normals = {}, uvs = {}, material = sm.material}
+    local out = {verts = {}, faces = {}, normals = {}, uvs = {}, material = sm.material, kind = sm.kind, slot = sm.slot, fi = sm.fi, along = sm.along, out = sm.out,
+                 at = sm.at, frame = sm.frame}
     for _, g in ipairs(groups) do
         if g.result then
             for _, poly in ipairs(g.result) do

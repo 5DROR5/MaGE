@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - edge wall
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -57,7 +57,7 @@ end
 -- BUILD
 -- =============================================================================
 
-local function build(stations, dists, tangents, sm, np, knots, thick)
+local function build(stations, dists, tangents, sm, np, knots, thick, only)
     local s0 = dists[1]
     if #knots < 2 then return end
     local list = {}
@@ -83,7 +83,9 @@ local function build(stations, dists, tangents, sm, np, knots, thick)
         if span > 1e-12 then f = math.max(0.0, math.min(1.0, (sv - dists[j]) / span)) end
         return j, f
     end
-    for _, c in ipairs({1, #stations[1].top}) do
+    local cols = {1, #stations[1].top}
+    if only then cols = {(only == "right") and 1 or #stations[1].top} end
+    for _, c in ipairs(cols) do
         local sign = (c == 1) and -1.0 or 1.0
         local rows = {}
         for _, sv in ipairs(stn) do

@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - bridge walls
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -23,6 +23,7 @@ local config = {
         railLength   = 4.0,
         pillarLength = 1.0,
         rampLength   = 2.0,
+        sides        = 0,
     },
 }
 
@@ -37,6 +38,8 @@ local fieldDefs = {
     {key = "railHeight",   label = "rail height",   min = 0.05, max = 5.0},
     {key = "thickness",    label = "fence width",   min = 0.05, max = 10.0},
     {key = "rampLength",   label = "ramp length",   min = 0.1,  max = 20.0},
+    {key = "sides",        label = "fence on",      min = 0,    max = 2,
+     choices = {{0, "both sides", "mage.side_both"}, {1, "right side", "mage.side_right"}, {2, "left side", "mage.side_left"}}},
 }
 
 local function defaults()
@@ -54,8 +57,8 @@ end
 -- LAYOUT
 -- =============================================================================
 
-local function layout(length, bp)
-    local ramp   = bp.rampLength
+local function layout(length, bp, loop)
+    local ramp   = loop and 0.0 or bp.rampLength
     local rail   = math.max(0.1, bp.railLength)
     local pillar = math.max(0.05, bp.pillarLength)
     local rh, ph = bp.railHeight, bp.pillarHeight
@@ -69,7 +72,7 @@ local function layout(length, bp)
     local scale   = inner / (n * rail + (n - 1) * pillar)
     local railLen = rail * scale
     local pillLen = pillar * scale
-    local pieces  = {{0.0, ramp, rh, ph}}
+    local pieces  = loop and {} or {{0.0, ramp, rh, ph}}
     local s       = ramp
     for k = 1, n do
         local e             = (k == n) and (length - ramp) or (s + railLen)
@@ -80,7 +83,7 @@ local function layout(length, bp)
             s                   = s + pillLen
         end
     end
-    pieces[#pieces + 1] = {length - ramp, length, ph, rh}
+    if not loop then pieces[#pieces + 1] = {length - ramp, length, ph, rh} end
     return pieces
 end
 
@@ -100,8 +103,9 @@ feature.build = function(stations, dists, tangents, sm, np, dims)
     if np < 2 then return end
     local bp    = dims or defaults()
     local s0    = dists[1]
-    local knots = W.knotsFromPieces(layout(dists[np] - s0, bp))
-    W.build(stations, dists, tangents, sm, np, knots, bp.thickness)
+    local knots = W.knotsFromPieces(layout(dists[np] - s0, bp, G.mr.lastBuild.seam))
+    local side  = math.floor((bp.sides or 0) + 0.5)
+    W.build(stations, dists, tangents, sm, np, knots, bp.thickness, (side == 1) and "right" or (side == 2) and "left" or nil)
 end
 
 G.registerFeature(feature)

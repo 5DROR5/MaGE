@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><authoring_tool>MaGE model</authoring_tool></contributor><unit name="meter" meter="1"/><up_axis>Z_UP</up_axis></asset>
+  <library_effects>
+    <effect id="italy_bld_old_concrete-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+    <effect id="italy_bld_ornaments_concrete-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+    <effect id="italy_bld_trim_concrete-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="italy_bld_old_concrete-material" name="italy_bld_old_concrete"><instance_effect url="#italy_bld_old_concrete-effect"/></material>
+    <material id="italy_bld_ornaments_concrete-material" name="italy_bld_ornaments_concrete"><instance_effect url="#italy_bld_ornaments_concrete-effect"/></material>
+    <material id="italy_bld_trim_concrete-material" name="italy_bld_trim_concrete"><instance_effect url="#italy_bld_trim_concrete-effect"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="corbel" name="corbel"><mesh>
+      <source id="corbel-positions"><float_array id="corbel-positions-array" count="66">-0.13105 -0.004395 0.91048 -0.13105 0.327671 0.679094 -0.13105 0.222511 0.600871 0.13106 0.619594 0.910479 0.13106 0.448372 0.708712 0.13106 0.565483 0.693034 0.13106 0.684399 0.856099 -0.13105 0.619591 0.91048 -0.13105 0.448372 0.708713 0.13106 -0.004399 0.91048 0.13106 0.222511 0.600871 0.13106 0.327667 0.679093 -0.13105 0.684395 0.8561 -0.13106 0.565487 0.693035 0.13106 0.663364 0.739439 -0.13105 0.663364 0.73944 -0.13104 0.11525 0.000002 -0.13105 -0.004394 0 -0.13105 -0.004395 0.60087 0.13106 -0.004398 0.60087 0.13106 -0.004398 0.000002 0.13106 0.115246 0.000002</float_array>
+        <technique_common><accessor source="#corbel-positions-array" count="22" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="corbel-normals"><float_array id="corbel-normals-array" count="102">-1 0.000007 -0.000003 -1 0 0 -1 0.00001 -0.000004 1 0.000013 -0.000034 1 0.000001 -0.000027 1 0.000021 -0.000033 1 0.00002 -0.000033 -1 -0.000017 0.000027 -1 -0.000007 0.000012 1 -0.000013 0.000004 1 -0.000011 0.000022 1 0.000006 0.000004 -1 -0.000002 0.000029 -1 -0.000004 0.00003 1 0 0 -1 0.000085 -0.000015 -1 0.000016 -0.000006 1 -0.000041 0.000003 0.000006 0.850455 -0.526047 0.000001 0.426026 -0.904711 0.000001 0.426033 -0.904708 0.000006 0.85046 -0.52604 -0.000007 0.642807 0.766028 -0.000008 0.940347 0.340217 -0.000008 0.940351 0.340207 -0.000003 0.05375 -0.998554 -0.000003 0.053746 -0.998555 -0.000002 0.154203 -0.988039 -0.000002 0.154198 -0.98804 -0.000004 0.794128 -0.60775 -0.000004 0.794122 -0.607758 0.000004 0.000008 -1 0.000007 0.984437 -0.175736 -0.000015 -1 0</float_array>
+        <technique_common><accessor source="#corbel-normals-array" count="34" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="corbel-colors"><float_array id="corbel-colors-array" count="66">0.947194 0.94568 0.94523 0.963198 0.962249 0.964817 0.966913 0.966279 0.969098 0.959443 0.958083 0.958633 0.972023 0.971295 0.974629 0.971283 0.97049 0.97282 0.963723 0.962532 0.963654 0.952611 0.950786 0.951159 0.963071 0.961908 0.964735 0.956716 0.955532 0.9554 0.968348 0.967653 0.969108 0.973216 0.97253 0.975369 0.959281 0.957871 0.959624 0.966887 0.965985 0.970065 0.972805 0.972047 0.974348 0.969746 0.969011 0.972684 0.950885 0.950192 0.951318 0.931073 0.930683 0.931185 0.936216 0.935445 0.935349 0.946515 0.946063 0.946374 0.954551 0.953985 0.954325 0.975069 0.974648 0.976912</float_array>
+        <technique_common><accessor source="#corbel-colors-array" count="22" stride="3"><param name="R" type="float"/><param name="G" type="float"/><param name="B" type="float"/></accessor></technique_common></source>
+      <source id="corbel-uv0"><float_array id="corbel-uv0-array" count="88">0.723718 0.970189 0.391657 0.738802 0.496812 0.660579 0.65703 0.970189 0.485813 0.768422 0.602926 0.752743 0.721837 0.915809 0.099733 0.970189 0.27095 0.768422 0.033043 0.970189 0.25995 0.660579 0.365106 0.738802 0.034926 0.915809 0.153837 0.752743 0.700801 0.799148 0.055962 0.799148 0.604074 0.059711 0.72372 0.059711 0.723719 0.660579 0.033043 0.660579 0.033042 0.059711 0.152689 0.059711 0.855228 0.342812 0.855226 0.404236 0.7938 0.404236 0.793802 0.342806 0.79379 0.663856 0.79379 0.624203 0.855216 0.624204 0.855216 0.663856 0.793797 0.462491 0.855223 0.462491 0.85522 0.517872 0.793794 0.517872 0.793792 0.568642 0.855218 0.568643 0.793817 0.000655 0.855243 0.000655 0.855243 0.056736 0.793817 0.05673 0.901453 0.645628 0.639339 0.645628 0.639339 0.044761 0.901453 0.044761</float_array>
+        <technique_common><accessor source="#corbel-uv0-array" count="44" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <source id="corbel-uv1"><float_array id="corbel-uv1-array" count="88">0.246345 0.413641 0.163329 0.355794 0.189618 0.336238 0.229672 0.413641 0.186869 0.363198 0.216147 0.359279 0.245874 0.400045 0.090348 0.413641 0.133153 0.363199 0.073676 0.413641 0.130403 0.336238 0.156692 0.355794 0.074147 0.400045 0.103875 0.359279 0.240616 0.37088 0.079406 0.37088 0.216434 0.186021 0.246345 0.186021 0.246345 0.336238 0.073676 0.336238 0.073676 0.186021 0.103587 0.186021 0.279222 0.256797 0.279222 0.272153 0.263865 0.272153 0.263865 0.256795 0.263863 0.337057 0.263864 0.327144 0.27922 0.327145 0.27922 0.337057 0.263865 0.286716 0.279222 0.286716 0.279221 0.300561 0.263864 0.300561 0.263864 0.313254 0.27922 0.313254 0.263869 0.171257 0.279226 0.171257 0.279226 0.185277 0.263869 0.185276 0.290778 0.3325 0.22525 0.3325 0.22525 0.182283 0.290778 0.182283</float_array>
+        <technique_common><accessor source="#corbel-uv1-array" count="44" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <vertices id="corbel-vertices"><input semantic="POSITION" source="#corbel-positions"/></vertices>
+      <triangles material="italy_bld_old_concrete" count="54">
+        <input semantic="VERTEX" source="#corbel-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#corbel-normals" offset="1"/>
+        <input semantic="COLOR" source="#corbel-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv1" offset="4" set="1"/>
+        <p>0 0 0 0 0 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 6 6 6 6 6 3 3 3 3 3 0 0 0 0 0 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 1 1 1 1 1 0 0 0 0 0 9 9 9 9 9 10 10 10 10 10 11 11 11 11 11 3 3 3 3 3 9 9 9 9 9 11 11 11 11 11 11 11 11 11 11 4 4 4 4 4 3 3 3 3 3 12 12 12 12 12 13 13 13 13 13 8 8 8 8 8 8 8 8 8 8 7 7 7 7 7 12 12 12 12 12 5 5 5 5 5 14 14 14 14 14 6 6 6 6 6 12 12 12 12 12 15 15 15 15 15 13 13 13 13 13 16 16 16 16 16 17 16 17 17 17 18 16 18 18 18 2 2 2 2 2 16 16 16 16 16 18 16 18 18 18 2 2 2 2 2 18 16 18 18 18 0 0 0 0 0 10 10 10 10 10 9 9 9 9 9 19 17 19 19 19 10 10 10 10 10 19 17 19 19 19 20 17 20 20 20 10 10 10 10 10 20 17 20 20 20 21 17 21 21 21</p>
+      </triangles>
+      <triangles material="italy_bld_ornaments_concrete" count="48">
+        <input semantic="VERTEX" source="#corbel-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#corbel-normals" offset="1"/>
+        <input semantic="COLOR" source="#corbel-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv1" offset="4" set="1"/>
+        <p>2 18 2 22 22 1 19 1 23 23 11 20 11 24 24 11 20 11 24 24 10 21 10 25 25 2 18 2 22 22 3 22 3 26 26 6 23 6 27 27 12 24 12 28 28 12 24 12 28 28 7 22 7 29 29 3 22 3 26 26 4 25 4 30 30 8 26 8 31 31 13 27 13 32 32 13 27 13 32 32 5 28 5 33 33 4 25 4 30 30 14 29 14 34 34 15 30 15 35 35 12 24 12 28 28 12 24 12 28 28 6 23 6 27 27 14 29 14 34 34 8 26 8 31 31 4 25 4 30 30 11 20 11 24 24 11 20 11 24 24 1 19 1 23 23 8 26 8 31 31 5 28 5 33 33 13 27 13 32 32 15 30 15 35 35 15 30 15 35 35 14 29 14 34 34 5 28 5 33 33 20 31 20 36 36 17 31 17 37 37 16 31 16 38 38 16 31 16 38 38 21 31 21 39 39 20 31 20 36 36 2 18 2 22 22 10 21 10 25 25 21 32 21 39 39 21 32 21 39 39 16 32 16 38 38 2 18 2 22 22</p>
+      </triangles>
+      <triangles material="italy_bld_trim_concrete" count="6">
+        <input semantic="VERTEX" source="#corbel-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#corbel-normals" offset="1"/>
+        <input semantic="COLOR" source="#corbel-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#corbel-uv1" offset="4" set="1"/>
+        <p>19 33 19 40 40 18 33 18 41 41 17 33 17 42 42 17 33 17 42 42 20 33 20 43 43 19 33 19 40 40</p>
+      </triangles>
+    </mesh></geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="Scene" name="Scene"><node id="node-base00" name="base00"><node id="node-start01" name="start01">
+    <node id="node-corbel" name="corbel_a40"><instance_geometry url="#corbel"><bind_material><technique_common><instance_material symbol="italy_bld_old_concrete" target="#italy_bld_old_concrete-material"/><instance_material symbol="italy_bld_ornaments_concrete" target="#italy_bld_ornaments_concrete-material"/><instance_material symbol="italy_bld_trim_concrete" target="#italy_bld_trim_concrete-material"/></technique_common></bind_material></instance_geometry></node>
+  </node><node id="node-nulldetail" name="nulldetail8"/></node></visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#Scene"/></scene>
+</COLLADA>

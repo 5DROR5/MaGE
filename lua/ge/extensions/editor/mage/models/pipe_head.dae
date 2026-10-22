@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><authoring_tool>MaGE model</authoring_tool></contributor><unit name="meter" meter="1"/><up_axis>Z_UP</up_axis></asset>
+  <library_effects>
+    <effect id="italy_bld_old_concrete-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="italy_bld_old_concrete-material" name="italy_bld_old_concrete"><instance_effect url="#italy_bld_old_concrete-effect"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="pipe_head" name="pipe_head"><mesh>
+      <source id="pipe_head-positions"><float_array id="pipe_head-positions-array" count="48">-0.121361 0.000131 0 -0.121361 0.14457 0 0.120439 0.14457 0 0.120439 0.00013 0 -0.120441 0.54187 0.425865 0.12136 0.54187 0.425865 0.12136 0.54187 0.361105 -0.120441 0.54187 0.361105 0.12136 0.00013 0.425865 0.12136 0.513108 0.264597 0.12136 0.426825 0.212673 -0.120441 0.426825 0.212673 -0.120441 0.513108 0.264597 0.12136 0.144571 0.04268 -0.120441 0.144571 0.042679 -0.120441 0.00013 0.425865</float_array>
+        <technique_common><accessor source="#pipe_head-positions-array" count="16" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="pipe_head-normals"><float_array id="pipe_head-normals-array" count="51">0 0 -1 0 1 -0.000001 0.000001 0.989532 -0.144315 1 0 0 0.999999 -0.001197 -0.000902 0 0.515617 -0.856819 0.000001 0.515772 -0.856726 0.000001 0.958347 -0.285607 0.000001 0.515927 -0.856632 0.000001 0.515927 -0.856633 -0.999999 0.001196 0.000902 -0.999991 0.003476 0.002621 -0.999979 0.005213 0.00393 0 1 -0.000009 0.999991 -0.003478 -0.002622 0.999979 -0.005216 -0.003932 -1 0 0</float_array>
+        <technique_common><accessor source="#pipe_head-normals-array" count="17" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="pipe_head-colors"><float_array id="pipe_head-colors-array" count="48">0.697479 0.681601 0.677126 0.699766 0.687142 0.689741 0.837209 0.823819 0.830988 0.836948 0.817371 0.812268 0.731919 0.721712 0.731009 0.792583 0.781124 0.790695 0.832213 0.821523 0.835313 0.692432 0.68087 0.686165 0.818094 0.802921 0.806297 0.890637 0.880785 0.901512 0.860833 0.848815 0.862876 0.767025 0.756069 0.768626 0.808956 0.799685 0.816561 0.872217 0.859036 0.870364 0.767084 0.757292 0.770125 0.596725 0.581942 0.576242</float_array>
+        <technique_common><accessor source="#pipe_head-colors-array" count="16" stride="3"><param name="R" type="float"/><param name="G" type="float"/><param name="B" type="float"/></accessor></technique_common></source>
+      <source id="pipe_head-uv0"><float_array id="pipe_head-uv0-array" count="54">0.301395 0.011317 0.301395 0.155757 0.059594 0.155756 0.059595 0.011317 0.300453 1.146143 0.058652 1.146133 0.058659 1.027432 0.300458 1.027438 -0.366271 0.553057 -0.366271 0.011317 -0.293719 0.552508 0.058669 0.764907 0.058667 0.535246 0.300473 0.53524 0.300468 0.764902 0.05867 0.198435 0.300471 0.198435 0.72726 0.011317 0.344075 0.155758 0.016915 0.155757 0.059595 0.155757 -0.153079 0.438012 -0.205003 0.524295 0.662501 0.553057 0.565993 0.524295 0.448952 0.420755 0.72726 0.553057</float_array>
+        <technique_common><accessor source="#pipe_head-uv0-array" count="27" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <source id="pipe_head-uv1"><float_array id="pipe_head-uv1-array" count="30">-0.016515 -0.229286 -0.016515 -0.084846 -0.258315 -0.084846 -0.258315 -0.229286 -0.017436 0.312454 -0.259236 0.312454 -0.259236 0.312453 -0.259236 -0.229286 -0.259236 0.283692 -0.259236 0.197409 -0.017436 0.197409 -0.017436 0.283692 -0.259236 -0.084845 -0.017436 -0.084845 -0.017436 -0.229286</float_array>
+        <technique_common><accessor source="#pipe_head-uv1-array" count="15" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <vertices id="pipe_head-vertices"><input semantic="POSITION" source="#pipe_head-positions"/></vertices>
+      <triangles material="italy_bld_old_concrete" count="72">
+        <input semantic="VERTEX" source="#pipe_head-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#pipe_head-normals" offset="1"/>
+        <input semantic="COLOR" source="#pipe_head-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_head-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#pipe_head-uv1" offset="4" set="1"/>
+        <p>0 0 0 0 0 1 0 1 1 1 2 0 2 2 2 2 0 2 2 2 3 0 3 3 3 0 0 0 0 0 4 1 4 4 4 5 1 5 5 5 6 2 6 6 6 6 2 6 6 6 7 2 7 7 4 4 1 4 4 4 5 3 5 8 5 8 4 8 9 7 6 3 6 10 6 9 5 9 11 8 10 6 10 12 9 11 6 11 13 10 11 6 11 13 10 12 5 12 14 11 9 5 9 11 8 6 2 6 6 6 9 7 9 11 8 12 7 12 14 11 12 7 12 14 11 7 2 7 7 4 6 2 6 6 6 11 6 11 13 10 10 6 10 12 9 13 8 13 15 12 13 8 13 15 12 14 9 14 16 13 11 6 11 13 10 15 10 15 17 14 14 11 14 18 13 1 12 1 1 1 1 12 1 1 1 0 12 0 0 0 15 10 15 17 14 14 13 14 16 13 13 13 13 15 12 2 13 2 2 2 2 13 2 2 2 1 13 1 1 1 14 13 14 16 13 13 14 13 19 12 8 4 8 9 7 3 15 3 3 3 3 15 3 3 3 2 15 2 20 2 13 14 13 19 12 8 4 8 9 7 13 14 13 19 12 10 3 10 21 9 10 3 10 21 9 9 3 9 22 8 6 3 6 10 6 6 3 6 10 6 8 4 8 9 7 10 3 10 21 9 7 16 7 23 4 12 16 12 24 11 11 16 11 25 10 11 16 11 25 10 15 10 15 17 14 7 16 7 23 4 15 10 15 17 14 4 16 4 26 4 7 16 7 23 4 15 10 15 17 14 11 16 11 25 10 14 11 14 18 13</p>
+      </triangles>
+    </mesh></geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="Scene" name="Scene"><node id="node-base00" name="base00"><node id="node-start01" name="start01">
+    <node id="node-pipe_head" name="pipe_head_a40"><instance_geometry url="#pipe_head"><bind_material><technique_common><instance_material symbol="italy_bld_old_concrete" target="#italy_bld_old_concrete-material"/></technique_common></bind_material></instance_geometry></node>
+  </node><node id="node-nulldetail" name="nulldetail8"/></node></visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#Scene"/></scene>
+</COLLADA>

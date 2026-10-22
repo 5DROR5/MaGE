@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - geometry settings
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -52,6 +52,12 @@ M.decal = {
     seamWeld      = 0.05,
     fanMinTurnDeg = 18.0,
     fanMaxReach   = 8.0,
+    surfUp        = 0.3,
+    surfDown      = 50.0,
+    surfGap       = 0.1,
+    surfMinNz     = 0.5,
+    surfStep      = 0.5,
+    surfSlope     = 0.2,
 }
 
 M.fillet = {

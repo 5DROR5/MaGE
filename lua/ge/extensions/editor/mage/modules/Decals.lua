@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MaGE - decal paths, junctions and traffic islands
--- Version: 1.0.1
+-- Version: 1.0.2
 -- License: AGPL-3.0 - https://www.gnu.org/licenses/agpl-3.0.html
 -- =============================================================================
 
@@ -456,7 +456,7 @@ local function arcPoints(cx, cy, pFrom, pTo, z, maxTurnDeg, through)
     return pts
 end
 
-local function roundPolylineCorners(ring, radius, minTurnDeg)
+local function roundRing(ring, radius, minTurnDeg)
     local n = #ring
     if n < 3 or radius <= 0 then return ring end
     local ccw = signedArea2D(ring) > 0
@@ -835,8 +835,9 @@ local function extractIslands(roads)
                 end
                 while #pts > 3 and near(pts[#pts], pts[1]) do table.remove(pts) end
 
+                local dims = thin[chain[1].i].curbDims
                 if island.roundCorners and #pts >= 3 then
-                    pts = roundPolylineCorners(pts, island.cornerRadius,
+                    pts = roundRing(pts, dims and dims.corner or island.cornerRadius,
                                                island.cornerMinTurnDeg)
                 end
 
@@ -854,6 +855,8 @@ local function extractIslands(roads)
                         curb        = base.curb, walk = base.walk,
                         profile     = base.profile or "island",
                         overObjects = base.overObjects,
+                        overSurface = base.overSurface,
+                        curbDims    = base.curbDims,
                         isIsland    = true,
                     }
                 end
@@ -1079,7 +1082,7 @@ local function pinches(pA, dA, hwA, pB, dB, hwB, scale)
     return false
 end
 
-local function solveInwardScale(pA, dA, hwA, pB, dB, hwB)
+local function solveInwardScale(pA, dA, pB, dB)
     if not fillet.keepInside then return 1.0 end
     local nA, nB = outwardNormals(dA, dB)
     if not nA then return 1.0 end
@@ -1222,7 +1225,7 @@ local function solveJunction(ptsA, wsA, ptsB, wsB)
     for _ = 1, 6 do
         local qA, qdA, qhwA, qB, qdB, qhwB = junctionState(ptsA, wsA, ptsB, wsB, ta, tb)
         if not qA then return nil, "decal too short" end
-        local scale = solveInwardScale(qA, qdA, qhwA, qB, qdB, qhwB)
+        local scale = solveInwardScale(qA, qdA, qB, qdB)
         if scale == nil then
             last = "outward bulge unavoidable"
         elseif pinches(qA, qdA, qhwA, qB, qdB, qhwB, scale) then
@@ -1626,6 +1629,8 @@ local function mergeJunctions(roads)
                 closed      = isCycle,
                 curb        = base.curb, walk = base.walk, profile = base.profile,
                 overObjects = base.overObjects,
+                overSurface = base.overSurface,
+                curbDims    = base.curbDims,
                 merged      = #segs,
             }
         end
@@ -1648,9 +1653,9 @@ local function buildIslandMesh(isl)
     local n = #outer
     if n < 3 then return nil end
 
-    local prof   = S.curbProfiles[isl.profile] or S.curbProfiles.island
-    local slopeV = math.min(prof.exposed, S.height)
-    local slopeH = math.min(math.tan(math.rad(prof.angle)) * slopeV, S.curbStrip * 0.9)
+    local prof   = G.profileOf(isl.profile, "island")
+    local slopeV = math.min(prof.exposed, G.curb.height)
+    local slopeH = math.min(math.tan(math.rad(prof.angle)) * slopeV, G.curb.strip * 0.9)
 
     local slopeRing = nil
     if slopeH > 1e-6 then
@@ -1664,9 +1669,9 @@ local function buildIslandMesh(isl)
     end
 
     local inner, innerTris, fillRing = nil, nil, nil
-    if S.curbStrip > 1e-6 then
-        local cand = fitInnerRing(outer, offsetPolygonInward(outer, S.curbStrip),
-                                  S.curbStrip)
+    if G.curb.strip > 1e-6 then
+        local cand = fitInnerRing(outer, offsetPolygonInward(outer, G.curb.strip),
+                                  G.curb.strip)
         local aOut, aIn = signedArea2D(outer), signedArea2D(cand)
         if aIn > island.minArea * 0.05 and aIn < aOut then
 
@@ -1680,19 +1685,36 @@ local function buildIslandMesh(isl)
     local curbMat = curbMaterialName()
     if not curbMat then return nil, "curb.material is not set in the styles config" end
     local walkMat = walkMaterialName()
-    local smCurb  = newSubmesh(curbMat)
-    local smWalk  = newSubmesh(walkMat or curbMat)
+    local smCurb  = mr.tagCurb(newSubmesh(curbMat))
+    local smWalk  = mr.tagWalk(newSubmesh(walkMat or curbMat))
 
     local overObjects = isl.overObjects and true or false
+    local surfZ, lo, hi = nil, math.huge, -math.huge
+    if isl.overSurface then
+        local hint = 0.0
+        for i = 1, n do hint = hint + outer[i].z end
+        surfZ = mr.surfaceSection(outer, hint / n, true)
+        for _, z in ipairs(surfZ or {}) do lo, hi = math.min(lo, z), math.max(hi, z) end
+    end
+    local function surfaceAt(p)
+        local h = mr.surfaceHit(p.x, p.y, p.z)
+        if h and h >= lo - decal.surfGap and h <= hi + decal.surfGap then return h end
+        local best, d = nil, math.huge
+        for i = 1, n do
+            local dx, dy = outer[i].x - p.x, outer[i].y - p.y
+            if dx * dx + dy * dy < d then best, d = surfZ[i], dx * dx + dy * dy end
+        end
+        return best
+    end
     local function mkz(p, drop)
-        local ground = overObjects and p.z or terrainZ(p.x, p.y, p.z)
+        local ground = (surfZ and surfaceAt(p)) or (overObjects and p.z) or terrainZ(p.x, p.y, p.z)
         return vec3(p.x, p.y, ground + S.zOffset + decal.lift - drop)
     end
 
     local topRing          = slopeRing or outer
     local oBot, oTop, oMid = {}, {}, {}
     for i = 1, n do
-        oBot[i] = mkz(outer[i], S.height)
+        oBot[i] = mkz(outer[i], G.curb.height)
         oTop[i] = mkz(topRing[i], 0.0)
         oMid[i] = slopeRing and mkz(outer[i], slopeV) or oTop[i]
     end
@@ -1713,7 +1735,7 @@ local function buildIslandMesh(isl)
     local totalPerim = perim[n] + math.sqrt((outer[1].x - outer[n].x) ^ 2
                                             + (outer[1].y - outer[n].y) ^ 2)
 
-    local flatW = S.curbStrip - slopeH
+    local flatW = G.curb.strip - slopeH
 
     for i = 1, n do
         local j       = (i % n) + 1
@@ -1722,10 +1744,10 @@ local function buildIslandMesh(isl)
         local outward = vec3(outer[j].y - outer[i].y, outer[i].x - outer[j].x, 0)
 
         pushWall(smCurb, oBot[i], oMid[i], oMid[j], oBot[j],
-                 {curbU(s0), curbFaceV(S.height)},
+                 {curbU(s0), curbFaceV(G.curb.height)},
                  {curbU(s0), curbFaceV(slopeV)},
                  {curbU(s1), curbFaceV(slopeV)},
-                 {curbU(s1), curbFaceV(S.height)},
+                 {curbU(s1), curbFaceV(G.curb.height)},
                  outward)
 
         if slopeRing then
@@ -1778,7 +1800,7 @@ local function buildIslandMesh(isl)
     if #smCurb.faces > 0 then out[#out + 1] = smCurb end
     if #smWalk.faces > 0 then out[#out + 1] = smWalk end
     if #out == 0 then return nil end
-    return out
+    return mr.placeAll(out)
 end
 
 -- =============================================================================

@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <authoring_tool>MaGE model</authoring_tool>
+    </contributor>
+    <created>2026-10-15T20:02:09Z</created>
+    <modified>2026-10-15T20:02:09Z</modified>
+    <unit name="meter" meter="1" />
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="italy_bld_object_atlas-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <diffuse>
+              <color>0.6 0.6 0.6 1</color>
+            </diffuse>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="italy_bld_object_atlas-material" name="italy_bld_object_atlas">
+      <instance_effect url="#italy_bld_object_atlas-effect" />
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="acunit_a40" name="acunit_a40">
+      <mesh>
+        <source id="acunit_a40-positions">
+          <float_array id="acunit_a40-positions-array" count="96">0.464633 0.38293 0.061817 0.464633 0.042595 0.061817 -0.46465 0.042595 0.061817 -0.46465 0.382931 0.061817 0.464633 0.38293 0.792401 -0.46465 0.38293 0.792401 -0.46465 0.042595 0.792401 0.464633 0.042595 0.792401 0.349786 0.035181 0.057259 0.389578 0.035181 0.057259 0.389578 0.380748 0.057259 0.349786 0.380748 0.057259 0.349786 0.000994 0.000001 0.349786 0.000994 0.420904 0.349786 0.035181 0.420904 0.349786 0.352015 0.023072 0.389578 0.035181 0.420904 0.389578 0.000994 0.420904 0.389578 0.000994 0.000001 0.389578 0.352015 0.023072 -0.398795 0.035181 0.057259 -0.359003 0.035181 0.057259 -0.359003 0.380748 0.057259 -0.398795 0.380748 0.057259 -0.398795 0.000994 0.000001 -0.398795 0.000994 0.420904 -0.398795 0.035181 0.420904 -0.398795 0.352015 0.023072 -0.359003 0.035181 0.420904 -0.359003 0.000994 0.420904 -0.359003 0.000994 0.000001 -0.359003 0.352015 0.023072</float_array>
+          <technique_common>
+            <accessor source="#acunit_a40-positions-array" count="32" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a40-normals">
+          <float_array id="acunit_a40-normals-array" count="21">0 0 -1 0 0 1 -1 0.000001 0 1 0 0 0 -1 0 0 1 0 -1 0 0</float_array>
+          <technique_common>
+            <accessor source="#acunit_a40-normals-array" count="7" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a40-colors">
+          <float_array id="acunit_a40-colors-array" count="96">0.845616 0.840944 0.87534 0.732796 0.728013 0.753575 0.73988 0.733969 0.757943 0.849486 0.843896 0.877144 0.853094 0.848049 0.87294 0.86915 0.863211 0.88771 0.774341 0.768676 0.785662 0.735912 0.73025 0.746208 0.583817 0.586394 0.613167 0.545712 0.54914 0.572054 0.666475 0.662183 0.690566 0.716567 0.714204 0.754119 0.693599 0.69351 0.730706 0.54344 0.547913 0.568275 0.450386 0.461514 0.480466 0.804609 0.801635 0.854107 0.478423 0.485964 0.50595 0.559907 0.560269 0.580672 0.651104 0.647472 0.670705 0.706815 0.701063 0.725895 0.643285 0.641685 0.666954 0.584067 0.586966 0.61111 0.712439 0.708341 0.748562 0.705302 0.699639 0.731569 0.696909 0.692067 0.717019 0.634659 0.632076 0.645873 0.519282 0.526367 0.541662 0.722905 0.716581 0.747694 0.504834 0.511363 0.526706 0.570849 0.57178 0.589331 0.68258 0.680936 0.715374 0.750404 0.747365 0.795836</float_array>
+          <technique_common>
+            <accessor source="#acunit_a40-colors-array" count="32" stride="3">
+              <param name="R" type="float" />
+              <param name="G" type="float" />
+              <param name="B" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a40-uv0">
+          <float_array id="acunit_a40-uv0-array" count="96">0.007602 0.972414 0.007602 0.801976 0.240292 0.801976 0.240292 0.972414 0.248169 0.801949 0.480859 0.801949 0.480859 0.972387 0.248169 0.972387 0.429769 0.408296 0.429769 0.774168 0.34455 0.774168 0.34455 0.408296 0.333388 0.407384 0.333388 0.773256 0.248169 0.773256 0.248169 0.407384 0.007984 0.024643 0.240615 0.024647 0.240615 0.390612 0.007984 0.390608 0.007984 0.407291 0.240615 0.407291 0.240617 0.773256 0.007986 0.773256 0.280591 0.227492 0.280591 0.187637 0.453649 0.187637 0.453649 0.227492 0.441605 0.409033 0.458725 0.351684 0.458725 0.773256 0.441605 0.773256 0.275124 0.136311 0.290606 0.104032 0.466774 0.104032 0.44781 0.159011 0.4654 0.409033 0.4654 0.773256 0.482521 0.773256 0.482521 0.351684 0.29002 0.058392 0.462706 0.081092 0.48167 0.026112 0.305502 0.026112 0.271814 0.390948 0.251886 0.390948 0.251886 0.026725 0.271814 0.026725</float_array>
+          <technique_common>
+            <accessor source="#acunit_a40-uv0-array" count="48" stride="2">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a40-uv1">
+          <float_array id="acunit_a40-uv1-array" count="24">-0.458522 -0.169398 -0.458522 0.170937 0.470761 0.170937 0.470761 -0.169398 0.122467 2.127106 -0.122467 2.127106 -0.122467 0.000004 0.122467 0.000004 0.122467 2.337536 0.122467 0.176871 -0.122467 2.337536 -0.122467 0.176871</float_array>
+          <technique_common>
+            <accessor source="#acunit_a40-uv1-array" count="12" stride="2">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="acunit_a40-vertices">
+          <input semantic="POSITION" source="#acunit_a40-positions" />
+        </vertices>
+        <triangles material="italy_bld_object_atlas" count="36">
+          <input semantic="VERTEX" source="#acunit_a40-vertices" offset="0" />
+          <input semantic="NORMAL" source="#acunit_a40-normals" offset="1" />
+          <input semantic="COLOR" source="#acunit_a40-colors" offset="2" set="0" />
+          <input semantic="TEXCOORD" source="#acunit_a40-uv0" offset="3" set="0" />
+          <input semantic="TEXCOORD" source="#acunit_a40-uv1" offset="4" set="1" />
+          <p>0 0 0 0 0 1 0 1 1 1 2 0 2 2 2 2 0 2 2 2 3 0 3 3 3 0 0 0 0 0 4 1 4 4 0 5 1 5 5 3 6 1 6 6 2 6 1 6 6 2 7 1 7 7 1 4 1 4 4 0 2 2 2 8 2 6 2 6 9 2 5 2 5 10 3 5 2 5 10 3 3 2 3 11 3 2 2 2 8 2 0 3 0 12 0 4 3 4 13 0 7 3 7 14 1 7 3 7 14 1 1 3 1 15 1 0 3 0 12 0 2 4 2 16 2 1 4 1 17 1 7 4 7 18 1 7 4 7 18 1 6 4 6 19 2 2 4 2 16 2 0 5 0 20 0 3 5 3 21 3 5 5 5 22 3 5 5 5 22 3 4 5 4 23 0 0 5 0 20 0 8 1 8 24 4 9 1 9 25 5 10 1 10 26 6 10 1 10 26 6 11 1 11 27 7 8 1 8 24 4 8 6 8 28 4 12 6 12 29 8 13 6 13 30 8 13 6 13 30 8 14 6 14 31 4 8 6 8 28 4 11 2 11 32 7 15 2 15 33 9 12 2 12 34 8 12 2 12 34 8 8 2 8 35 4 11 2 11 32 7 9 3 9 36 5 16 3 16 37 5 17 3 17 38 10 17 3 17 38 10 18 3 18 39 10 9 3 9 36 5 10 3 10 40 6 9 3 9 41 5 18 3 18 42 10 18 3 18 42 10 19 3 19 43 11 10 3 10 40 6 14 5 14 44 4 16 5 16 45 5 9 5 9 46 5 9 5 9 46 5 8 5 8 47 4 14 5 14 44 4 20 1 20 24 4 21 1 21 25 5 22 1 22 26 6 22 1 22 26 6 23 1 23 27 7 20 1 20 24 4 20 6 20 28 4 24 6 24 29 8 25 6 25 30 8 25 6 25 30 8 26 6 26 31 4 20 6 20 28 4 23 2 23 32 7 27 2 27 33 9 24 2 24 34 8 24 2 24 34 8 20 2 20 35 4 23 2 23 32 7 21 3 21 36 5 28 3 28 37 5 29 3 29 38 10 29 3 29 38 10 30 3 30 39 10 21 3 21 36 5 22 3 22 40 6 21 3 21 41 5 30 3 30 42 10 30 3 30 42 10 31 3 31 43 11 22 3 22 40 6 26 5 26 44 4 28 5 28 45 5 21 5 21 46 5 21 5 21 46 5 20 5 20 47 4 26 5 26 44 4</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="acunit_a15" name="acunit_a15">
+      <mesh>
+        <source id="acunit_a15-positions">
+          <float_array id="acunit_a15-positions-array" count="24">0.464633 0.38293 0.061817 0.464633 0.042595 0.061817 -0.46465 0.042595 0.061817 -0.46465 0.382931 0.061817 0.464633 0.38293 0.792401 -0.46465 0.38293 0.792401 -0.46465 0.042595 0.792401 0.464633 0.042595 0.792401</float_array>
+          <technique_common>
+            <accessor source="#acunit_a15-positions-array" count="8" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a15-normals">
+          <float_array id="acunit_a15-normals-array" count="18">0 0 -1 0 0 1 -1 0.000001 0 1 0 0 0 -1 0 0 1 0</float_array>
+          <technique_common>
+            <accessor source="#acunit_a15-normals-array" count="6" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a15-colors">
+          <float_array id="acunit_a15-colors-array" count="24">0.845616 0.840944 0.87534 0.732796 0.728013 0.753575 0.73988 0.733969 0.757943 0.849486 0.843896 0.877144 0.853094 0.848049 0.87294 0.86915 0.863211 0.88771 0.774341 0.768676 0.785662 0.735912 0.73025 0.746208</float_array>
+          <technique_common>
+            <accessor source="#acunit_a15-colors-array" count="8" stride="3">
+              <param name="R" type="float" />
+              <param name="G" type="float" />
+              <param name="B" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a15-uv0">
+          <float_array id="acunit_a15-uv0-array" count="48">0.007602 0.972414 0.007602 0.801976 0.240292 0.801976 0.240292 0.972414 0.248169 0.801949 0.480859 0.801949 0.480859 0.972387 0.248169 0.972387 0.429769 0.408296 0.429769 0.774168 0.34455 0.774168 0.34455 0.408296 0.333388 0.407384 0.333388 0.773256 0.248169 0.773256 0.248169 0.407384 0.007984 0.024643 0.240615 0.024647 0.240615 0.390612 0.007984 0.390608 0.007984 0.407291 0.240615 0.407291 0.240617 0.773256 0.007986 0.773256</float_array>
+          <technique_common>
+            <accessor source="#acunit_a15-uv0-array" count="24" stride="2">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="acunit_a15-uv1">
+          <float_array id="acunit_a15-uv1-array" count="8">-0.458522 -0.169398 -0.458522 0.170937 0.470761 0.170937 0.470761 -0.169398</float_array>
+          <technique_common>
+            <accessor source="#acunit_a15-uv1-array" count="4" stride="2">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="acunit_a15-vertices">
+          <input semantic="POSITION" source="#acunit_a15-positions" />
+        </vertices>
+        <triangles material="italy_bld_object_atlas" count="12">
+          <input semantic="VERTEX" source="#acunit_a15-vertices" offset="0" />
+          <input semantic="NORMAL" source="#acunit_a15-normals" offset="1" />
+          <input semantic="COLOR" source="#acunit_a15-colors" offset="2" set="0" />
+          <input semantic="TEXCOORD" source="#acunit_a15-uv0" offset="3" set="0" />
+          <input semantic="TEXCOORD" source="#acunit_a15-uv1" offset="4" set="1" />
+          <p>0 0 0 0 0 1 0 1 1 1 2 0 2 2 2 2 0 2 2 2 3 0 3 3 3 0 0 0 0 0 4 1 4 4 0 5 1 5 5 3 6 1 6 6 2 6 1 6 6 2 7 1 7 7 1 4 1 4 4 0 2 2 2 8 2 6 2 6 9 2 5 2 5 10 3 5 2 5 10 3 3 2 3 11 3 2 2 2 8 2 0 3 0 12 0 4 3 4 13 0 7 3 7 14 1 7 3 7 14 1 1 3 1 15 1 0 3 0 12 0 2 4 2 16 2 1 4 1 17 1 7 4 7 18 1 7 4 7 18 1 6 4 6 19 2 2 4 2 16 2 0 5 0 20 0 3 5 3 21 3 5 5 5 22 3 5 5 5 22 3 4 5 4 23 0 0 5 0 20 0</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="node-base00" name="base00">
+        <node id="node-start01" name="start01">
+          <node id="node-acunit_a40" name="acunit_a40">
+            <instance_geometry url="#acunit_a40">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="italy_bld_object_atlas" target="#italy_bld_object_atlas-material">
+                    <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0" />
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+          <node id="node-acunit_a15" name="acunit_a15">
+            <instance_geometry url="#acunit_a15">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="italy_bld_object_atlas" target="#italy_bld_object_atlas-material">
+                    <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0" />
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+        </node>
+        <node id="node-nulldetail" name="nulldetail4" />
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene" />
+  </scene>
+</COLLADA>

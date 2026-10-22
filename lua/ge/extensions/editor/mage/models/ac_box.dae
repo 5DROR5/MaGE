@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset><contributor><authoring_tool>MaGE model</authoring_tool></contributor><unit name="meter" meter="1"/><up_axis>Z_UP</up_axis></asset>
+  <library_effects>
+    <effect id="eca_bld_house_decoration-effect"><profile_COMMON><technique sid="common"><blinn><diffuse><color>0.6 0.6 0.6 1</color></diffuse></blinn></technique></profile_COMMON></effect>
+  </library_effects>
+  <library_materials>
+    <material id="eca_bld_house_decoration-material" name="eca_bld_house_decoration"><instance_effect url="#eca_bld_house_decoration-effect"/></material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="ac_box" name="ac_box"><mesh>
+      <source id="ac_box-positions"><float_array id="ac_box-positions-array" count="102">-0.302613 0.113914 0.064794 -0.302613 0.113914 0.588884 -0.302613 0.517432 0.588884 -0.302613 0.517432 0.064794 0.302613 0.517432 0.588884 0.302613 0.517432 0.064794 0.302613 0.113914 0.064794 0.302613 0.113914 0.588884 0.062764 0.519431 0.534972 0.068866 0.519431 0.558047 0.23352 0.519431 0.558047 -0.233403 0.519431 0.558047 -0.068749 0.519431 0.558047 -0.062648 0.519431 0.534972 -0.233403 0.519431 0.091902 -0.077762 0.519431 0.091902 0.077879 0.519431 0.091902 0.23352 0.519431 0.091902 0.189927 0.000128 0 0.189927 0.000128 0.064235 0.189926 0.523872 0.064235 0.189926 0.523872 0 0.210236 0.523872 0.064235 0.210236 0.523872 0 0.210236 0.000128 0 0.210236 0.000128 0.064235 -0.189764 0.523872 0 -0.189764 0.523872 0.064235 -0.189764 0.000128 0.064235 -0.189764 0.000128 0 -0.210073 0.000128 0.064235 -0.210073 0.000128 0 -0.210074 0.523872 0 -0.210074 0.523872 0.064235</float_array>
+        <technique_common><accessor source="#ac_box-positions-array" count="34" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="ac_box-normals"><float_array id="ac_box-normals-array" count="18">-1 0 0 0 1 0 0 0 -1 0 0 1 0 -1 0 1 0 0</float_array>
+        <technique_common><accessor source="#ac_box-normals-array" count="6" stride="3"><param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/></accessor></technique_common></source>
+      <source id="ac_box-colors"><float_array id="ac_box-colors-array" count="3">1 1 1</float_array>
+        <technique_common><accessor source="#ac_box-colors-array" count="1" stride="3"><param name="R" type="float"/><param name="G" type="float"/><param name="B" type="float"/></accessor></technique_common></source>
+      <source id="ac_box-uv0"><float_array id="ac_box-uv0-array" count="116">0.516602 0.734375 0.516602 0.999023 0.3125 0.999023 0.3125 0.734375 0.308594 0.529297 0.308594 0.792969 0.00293 0.792969 0.00293 0.529297 0.3125 0.52832 0.618164 0.52832 0.618164 0.731445 0.3125 0.731445 0.308594 0.999023 0.00293 0.999023 0.00293 0.795898 0.308594 0.795898 0.520508 0.734375 0.826172 0.734375 0.826172 0.999023 0.520508 0.999023 0.621094 0.52832 0.621094 0.731445 0.885742 0.731445 0.885742 0.52832 0.850586 0.513672 0.847656 0.525391 0.765625 0.525391 0.999023 0.525391 0.916016 0.525391 0.913086 0.513672 0.999023 0.291992 0.920898 0.291992 0.842773 0.291992 0.765625 0.291992 0.955078 0.859375 0.922852 0.859375 0.922852 0.597656 0.955078 0.597656 0.986328 0.90332 0.986328 0.935547 0.975586 0.935547 0.975586 0.90332 0.907227 0.859375 0.896484 0.859375 0.896484 0.597656 0.907227 0.597656 0.919922 0.859375 0.910156 0.859375 0.910156 0.597656 0.919922 0.597656 0.975586 0.868164 0.986328 0.868164 0.986328 0.900391 0.975586 0.900391 0.958008 0.859375 0.958008 0.597656 0.990234 0.597656 0.990234 0.859375</float_array>
+        <technique_common><accessor source="#ac_box-uv0-array" count="58" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <source id="ac_box-uv1"><float_array id="ac_box-uv1-array" count="40">0.302613 0.148086 0.302613 -0.255432 -0.302613 -0.255432 -0.302613 0.148086 -0.062765 -0.257431 -0.068866 -0.257431 -0.23352 -0.257431 0.233403 -0.257431 0.068749 -0.257431 0.062648 -0.257431 0.077762 -0.257431 -0.077879 -0.257431 -0.189926 0.261872 -0.189926 -0.261872 -0.210236 -0.261872 -0.210236 0.261872 0.189764 -0.261872 0.189764 0.261872 0.210073 0.261872 0.210073 -0.261872</float_array>
+        <technique_common><accessor source="#ac_box-uv1-array" count="20" stride="2"><param name="S" type="float"/><param name="T" type="float"/></accessor></technique_common></source>
+      <vertices id="ac_box-vertices"><input semantic="POSITION" source="#ac_box-positions"/></vertices>
+      <triangles material="eca_bld_house_decoration" count="132">
+        <input semantic="VERTEX" source="#ac_box-vertices" offset="0"/>
+        <input semantic="NORMAL" source="#ac_box-normals" offset="1"/>
+        <input semantic="COLOR" source="#ac_box-colors" offset="2" set="0"/>
+        <input semantic="TEXCOORD" source="#ac_box-uv0" offset="3" set="0"/>
+        <input semantic="TEXCOORD" source="#ac_box-uv1" offset="4" set="1"/>
+        <p>0 0 0 0 0 1 0 0 1 0 2 0 0 2 1 2 0 0 2 1 3 0 0 3 1 0 0 0 0 0 3 1 0 4 1 2 1 0 5 1 4 1 0 6 2 4 1 0 6 2 5 1 0 7 2 3 1 0 4 1 6 2 0 8 3 0 2 0 9 0 3 2 0 10 1 3 2 0 10 1 5 2 0 11 2 6 2 0 8 3 1 3 0 12 0 7 3 0 13 3 4 3 0 14 2 4 3 0 14 2 2 3 0 15 1 1 3 0 12 0 0 4 0 16 0 6 4 0 17 3 7 4 0 18 3 7 4 0 18 3 1 4 0 19 0 0 4 0 16 0 6 5 0 20 3 5 5 0 21 2 4 5 0 22 2 4 5 0 22 2 7 5 0 23 3 6 5 0 20 3 8 1 0 24 4 9 1 0 25 5 10 1 0 26 6 11 1 0 27 7 12 1 0 28 8 13 1 0 29 9 14 1 0 30 7 11 1 0 27 7 13 1 0 29 9 13 1 0 29 9 15 1 0 31 10 14 1 0 30 7 15 1 0 31 10 13 1 0 29 9 8 1 0 24 4 8 1 0 24 4 16 1 0 32 11 15 1 0 31 10 16 1 0 32 11 8 1 0 24 4 10 1 0 26 6 10 1 0 26 6 17 1 0 33 6 16 1 0 32 11 18 0 0 34 12 19 0 0 35 12 20 0 0 36 13 20 0 0 36 13 21 0 0 37 13 18 0 0 34 12 21 1 0 38 13 20 1 0 39 13 22 1 0 40 14 22 1 0 40 14 23 1 0 41 14 21 1 0 38 13 24 2 0 42 15 18 2 0 43 12 21 2 0 44 13 21 2 0 44 13 23 2 0 45 14 24 2 0 42 15 19 3 0 46 12 25 3 0 47 15 22 3 0 48 14 22 3 0 48 14 20 3 0 49 13 19 3 0 46 12 18 4 0 50 12 24 4 0 51 15 25 4 0 52 15 25 4 0 52 15 19 4 0 53 12 18 4 0 50 12 24 5 0 54 15 23 5 0 55 14 22 5 0 56 14 22 5 0 56 14 25 5 0 57 15 24 5 0 54 15 26 5 0 34 16 27 5 0 35 16 28 5 0 36 17 28 5 0 36 17 29 5 0 37 17 26 5 0 34 16 29 4 0 38 17 28 4 0 39 17 30 4 0 40 18 30 4 0 40 18 31 4 0 41 18 29 4 0 38 17 32 2 0 42 19 26 2 0 43 16 29 2 0 44 17 29 2 0 44 17 31 2 0 45 18 32 2 0 42 19 27 3 0 46 16 33 3 0 47 19 30 3 0 48 18 30 3 0 48 18 28 3 0 49 17 27 3 0 46 16 26 1 0 50 16 32 1 0 51 19 33 1 0 52 19 33 1 0 52 19 27 1 0 53 16 26 1 0 50 16 32 0 0 54 19 31 0 0 55 18 30 0 0 56 18 30 0 0 56 18 33 0 0 57 19 32 0 0 54 19</p>
+      </triangles>
+    </mesh></geometry>
+  </library_geometries>
+  <library_visual_scenes><visual_scene id="Scene" name="Scene"><node id="node-base00" name="base00"><node id="node-start01" name="start01">
+    <node id="node-ac_box" name="ac_box_a40"><instance_geometry url="#ac_box"><bind_material><technique_common><instance_material symbol="eca_bld_house_decoration" target="#eca_bld_house_decoration-material"/></technique_common></bind_material></instance_geometry></node>
+  </node><node id="node-nulldetail" name="nulldetail8"/></node></visual_scene></library_visual_scenes>
+  <scene><instance_visual_scene url="#Scene"/></scene>
+</COLLADA>
